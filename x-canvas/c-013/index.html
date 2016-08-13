@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-013</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+	(function(window, document) {
+
+		"use strict";
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight,
+			mouse = {
+				x: w / 2,
+				y: h / 2
+			};
+
+/**
+ *========================================
+ */
+ 		function Circle(x, y, r, color) {
+ 			this.x = x;
+ 			this.y = y;
+ 			this.r = r;
+ 			this.vx = 0;
+ 			this.vy = 0;
+ 			this.color = color;
+ 		}
+
+ 		Circle.prototype = {
+ 			constructor: Circle, 
+ 			update: function(target) {
+ 				this.vx += (target.x - this.x) * 0.05;
+ 				this.vy += (target.y - this.y) * 0.05;
+ 				this.vy += 3;
+ 				this.vx *= 0.8;
+ 				this.vy *= 0.8;
+ 				this.x += this.vx;
+ 				this.y += this.vy;
+ 			},
+ 			render: function(ctx, target) {
+
+ 				ctx.fillStyle = this.color;
+
+ 				ctx.save();
+ 				ctx.translate(this.x, this.y);
+ 				ctx.beginPath();
+ 				ctx.arc(0, 0, this.r, 0, Math.PI * 2);
+ 				ctx.fill();
+ 				ctx.restore();
+
+ 				ctx.strokeStyle = "black";
+ 				ctx.beginPath();
+ 				ctx.moveTo(target.x, target.y);
+ 				ctx.lineTo(this.x, this.y);
+ 				ctx.stroke();
+
+
+ 			}
+ 		};
+/**
+ *========================================
+ */ 
+ 		var circle = null,
+ 			circles = [],
+ 			numObjects = 10;
+
+ 		for(var i = 0; i < numObjects; i++) {
+			circle = new Circle(w/2, h/2, 10 + Math.random() * 10, "hsla(" + (Math.random() * 360) + ", 100%, 50%, 0.5)");
+			circles.push(circle);
+ 		}
+
+
+ 		document.addEventListener("mousemove", function(e) {
+ 			mouse.x = e.clientX;
+ 			mouse.y = e.clientY;
+ 		});
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.clearRect(0, 0, w, h);
+
+ 			for(var i = 0; i < numObjects; i++) {
+ 				circle = circles[i];
+ 				if(i === 0) {
+	 				circle.update(mouse);
+	 				circle.render(ctx, mouse); 			 					
+ 				}
+ 				else {
+	 				circle.update(circles[i-1]);
+	 				circle.render(ctx, circles[i-1]); 			 					
+ 				}
+ 			}
+
+ 		});
+
+
+	})(window, document);
+	</script>
+</body>
+</html>

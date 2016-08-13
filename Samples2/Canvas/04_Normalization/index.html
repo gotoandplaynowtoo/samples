@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Normalization</title>
+	<style>
+
+	* {
+		padding: 0;
+		margin: 0;
+	}
+
+	html, body {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	body {
+		background: #eee;
+	}
+
+	canvas {
+		display: block;
+		background-color: white;
+	}
+
+	.canvas-container {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+
+	</style>
+</head>
+<body>
+	<div class="canvas-container">
+		<canvas id="c"></canvas>
+	</div>
+	<script>
+	"use strict";
+	;(function(main) {
+		main(window, document);
+	})(function(window, document) {
+
+		var canvas = document.getElementById("c"),
+			context =canvas.getContext("2d"),
+			width = canvas.width = 960,
+			height = canvas.height = 600;
+/**
+ * =====================================================
+ */			
+ 		function normalize(value, min, max) {
+ 			return (value - min) / (max - min);
+ 		}
+/**
+ * =====================================================
+ */			 
+ 		var point = {
+ 			x: 0,
+ 			y: height / 2
+ 		};
+
+ 		var delay = 40,
+ 			delayCtr = 0,
+ 			target = width;
+
+ 		requestAnimationFrame(function frame() {
+ 			requestAnimationFrame(frame);
+
+ 			var norm = normalize(point.x, 0, width);
+
+ 			if(delayCtr >= delay) {
+
+ 				delayCtr = delay;
+ 				point.x += (target - point.x) * 0.1;
+
+ 				if(Math.abs(target - point.x) < 0.1) {
+
+ 					delayCtr = 0;
+ 					point.x = target;
+
+ 					if(target === width)
+ 						target = 0;
+ 					else {
+ 						target = width;
+ 					}
+
+ 				}//END IF - INNER
+ 			}//END IF - OUTER
+
+ 			delayCtr++;
+ 			
+ 			context.clearRect(0, 0, width, height);
+
+ 			context.fillStyle = "#222";
+
+ 			context.font = "12px Courier New";
+ 			context.fillText("Normalize x coordinate (0 - " + width + "): " + norm, 10, 20);
+ 			context.fillText("x coordinate: " + point.x, 10, 40);
+
+ 			context.beginPath();
+ 			context.arc(point.x, point.y, 10, 0, Math.PI * 2);
+ 			context.fill();
+
+ 		});
+
+	});
+	</script>
+</body>
+</html>

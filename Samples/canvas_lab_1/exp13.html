@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Exp 13</title>
+	<style type="text/css">
+		body
+		{
+			margin: 0;
+			padding: 0;
+		}
+		
+		#canvas2D {
+			display: block;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas2D"></canvas>
+	<script type="text/javascript" src="requestanimframe.js"></script>
+	<script type="text/javascript">
+		var canvas2D = null;
+		var context2D = null;
+		var clearScreenColor = null;
+		var points = [];
+
+		
+		document.body.onload = init;
+		
+	
+		function init()
+		{
+			//initialize canvas2D
+			canvas2D = document.getElementById("canvas2D");
+			canvas2D.width = window.innerWidth;
+			canvas2D.height = window.innerHeight;
+			
+			//initialize context2D
+			context2D = canvas2D.getContext("2d");
+			
+			clearScreenColor = "rgba(0, 0, 0, 1)";
+			clearScreen();
+			
+			var color = randColor();
+			var point = new Point(0, window.innerHeight-10, 10, color, randRange(50, 100));
+			
+			point.vx = randRange(5, 6);
+			point.vy = randRange(-2, -3);
+			point.angleInc = 0.05;
+			
+			
+			
+			points.push(point);
+						
+			frameLoop();
+		}
+		
+		function frameLoop()
+		{
+			drawObjects();
+			requestAnimFrame(frameLoop);
+		}
+		
+		
+		function drawObjects()
+		{
+			var len = points.length;
+			
+			for(var i = 0; i < len; i++)
+			{
+				points[i].update();
+				
+				if(points[i].centerX > window.innerWidth || points[i].centerY < 0)
+				{
+					
+					var color = randColor();
+				
+					context2D.strokeStyle = color;
+					context2D.beginPath();
+					context2D.moveTo(0, window.innerHeight-10);
+					
+					points[i].centerX = 0;
+					points[i].centerY = window.innerHeight-10;
+					
+					points[i].x = 0;
+					points[i].y = window.innerHeight - 10;
+					
+					points[i].vx = randRange(5, 6);
+					points[i].vy = randRange(-2, -3);					
+					
+					points[i].oscillationRange = randRange(50, 100);
+				}
+				
+				points[i].render();
+			}
+		}
+				
+		function Point(x, y, width, color, oscillationRange)
+		{
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.color = color;
+			this.vx = 0;
+			this.vy = 0;
+			this.centerX = x;
+			this.centerY = y;
+			this.angleInc = 0;
+			this.angle = 0;
+			this.oscillationRange = oscillationRange;
+
+			context2D.strokeStyle = this.color;
+			context2D.lineWidth = this.width;
+			context2D.beginPath();
+			context2D.moveTo(this.x, this.y);
+			
+			
+			this.render = function()
+			{
+				context2D.lineTo(this.x, this.y);
+				context2D.stroke();
+			};
+			
+			
+			this.update = function()
+			{
+				this.x = this.centerX + Math.sin(this.angle) * this.oscillationRange;
+				this.y = this.centerY + Math.sin(this.angle) * this.oscillationRange;
+				
+				this.centerX += this.vx;
+				this.centerY += this.vy;
+				this.angle += this.angleInc;
+			};
+		}
+		
+		
+		
+		function clearScreen()
+		{	
+			context2D.fillStyle = clearScreenColor;
+			context2D.fillRect(0, 0, window.innerWidth, window.innerHeight);
+		}
+		
+		
+		function randRange(min, max)
+		{
+			return Math.random() * (max - min) + min;
+		}
+		
+		function randColor()
+		{
+			var r = Math.random() * 255 >> 0;
+			var g = Math.random() * 255 >> 0;
+			var b = Math.random() * 255 >> 0;
+			
+			return color = "rgba("+ r +","+ g + ","+ b +",0.05)";				
+		}
+		
+	</script>
+</body>
+</html>

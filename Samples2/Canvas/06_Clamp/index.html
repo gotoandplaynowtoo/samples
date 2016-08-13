@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Clamp</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	html, 
+	body {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	body {
+		background: #eee;
+	}
+
+	canvas {
+		display: block;
+		background: white;
+	}
+
+	.canvas-container {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+	</style>
+</head>
+<body>
+	<div class="canvas-container">
+		<canvas id="c"></canvas>
+	</div>
+	<script>
+	"use strict";
+	;(function(main) {
+		main(window, document);
+	})(function(window, document) {
+
+		var canvas = document.getElementById("c"),
+			context = canvas.getContext("2d"),
+			width = canvas.width = 960,
+			height = canvas.height = 600;
+
+/**
+ * ===================================================
+ */			
+ 		function clamp(value, min, max) {
+ 			return Math.min(Math.max(value, min), max);
+ 		}
+
+/**
+ * ===================================================
+ */ 
+ 		var boundingRect = canvas.getBoundingClientRect(),
+ 			mouse = {
+ 				x: width / 2,
+ 				y: height / 2
+ 			};
+
+ 		var rect = {
+ 			x: width / 2 - 200,
+ 			y: height / 2 - 200,
+ 			width: 400,
+ 			height: 400
+ 		};
+ 		
+ 		document.body.addEventListener("mousemove", function(e) {
+ 			mouse.x = e.clientX - boundingRect.left;
+ 			mouse.y = e.clientY - boundingRect.top;
+ 		});
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			mouse.x = clamp(mouse.x, rect.x, rect.x + rect.width);
+ 			mouse.y = clamp(mouse.y, rect.y, rect.y + rect.height);
+
+ 			context.clearRect(0, 0, width, height);
+
+ 			context.fillStyle = "rgba(0, 255, 0, 0.8)";
+ 			context.beginPath()
+ 			context.arc(mouse.x, mouse.y, 10, 0, Math.PI * 2);
+ 			context.fill();
+
+ 			context.fillStyle = "black";
+ 			context.font = "12px Courier New";
+ 			context.fillText("mouse { x: " + mouse.x + ", y: " + mouse.y + " }", 10, 20);
+
+ 			context.fillStyle = "rgba(0, 0, 0, 0.5)";
+ 			context.fillRect(rect.x, rect.y, rect.width, rect.height);
+
+ 			context.strokeStyle = "rgba(0, 255, 0, 1)";
+ 			context.beginPath();
+ 			context.moveTo(width / 2, height / 2);
+ 			context.lineTo(mouse.x, mouse.y);
+ 			context.stroke();
+
+ 		});
+
+	});
+	</script>
+</body>
+</html>

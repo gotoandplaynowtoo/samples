@@ -1,0 +1,147 @@
+/*==================================== COMMON STYLING ====================================*/
+
+body {
+	background: #222;;
+	color: #FFF;
+	font-family: 'Segoe UI', Tahoma, sans-serif;
+	font-size: 14px;			
+}
+
+h1 {
+	font-size: 50px;
+	text-transform: uppercase;
+}
+
+
+a {
+	text-decoration: none;
+	color: #FFF;
+}
+
+/*==================================== HEADERS ====================================*/
+
+.header{
+	margin: 20px 0px 50px 0px;
+	font-family: 'gothic';
+	letter-spacing: 1px;
+}
+
+
+/*==================================== FONTS ====================================*/
+@font-face {
+	font-family: 'gothic';
+	src: url('../fonts/league_gothic-webfont.eot');
+	src: url('../fonts/league_gothic-webfont.eot?#iefix') format('embedded-opentype'),
+		 url('../fonts/league_gothic-webfont.woff') format('woff'),
+		 url('../fonts/league_gothic-webfont.ttf') format('truetype'),
+		 url('../fonts/league_gothic-webfont.svg#league_gothicregular') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+
+
+
+
+/*==================================== CONTAINER ====================================*/		
+
+.container {
+	width: 1170px;
+	height: 500px;
+	margin: 0px auto;
+}
+
+.bubble-sort-container {
+	position: relative;
+	background: white;
+	height: 300px;
+}
+
+.anim-controller-container {
+	margin: 10px 0px 5px 0px;
+	overflow: hidden;
+}
+
+
+
+/*==================================== CONTROLLERS ====================================*/		
+
+.anim-controller {
+	padding: 3px 0px;
+	float:right;
+}
+
+
+.anim-controller a {
+	width: 14px;
+	height: 14px;	
+	display: inline-block;				
+}
+
+.object-size-controller {
+	margin: 10px 0px 20px 0px; 
+	letter-spacing: 1px;
+}
+
+
+/*==================================== HOVERS, ACTIVE ====================================*/		
+.play {
+	background: url('../img/glyphicons-halflings-white.png') no-repeat -264px -72px;
+}
+
+.play:active {
+	background: url('../img/glyphicons-halflings.png') no-repeat -264px -72px;
+}
+
+
+.pause {
+	background: url('../img/glyphicons-halflings-white.png') no-repeat -288px -72px;
+}
+
+.pause:active {
+	background: url('../img/glyphicons-halflings.png') no-repeat -288px -72px;
+}		
+
+
+
+.stop {
+	background: url('../img/glyphicons-halflings-white.png') no-repeat -312px -72px;
+}		
+
+.stop:active {
+	background: url('../img/glyphicons-halflings.png') no-repeat -312px -72px;
+}			
+
+
+.random {
+	background: url('../img/glyphicons-halflings-white.png') no-repeat -216px -120px;
+}	
+
+.random:active {
+	background: url('../img/glyphicons-halflings.png') no-repeat -216px -120px;
+}
+
+
+.text-glow:hover {
+	text-shadow: 0px 0px 10px #ffc;
+}
+
+.border-glow:hover {
+	box-shadow:0 0 10px #ffc;
+}
+
+
+/*==================================== EFFECTS ====================================*/		
+.border-glow {
+	-webkit-transition:box-shadow 500ms linear 0s;
+}
+
+.text-glow {
+	-webkit-transition: text-shadow 500ms linear 0s;		
+}
+
+
+
+
+
+

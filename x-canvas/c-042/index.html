@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-041</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script src="../utility/V2D-v0.1.js"></script>
+	<script src="../utility/collision.js"></script>
+	<script>
+
+	"use strict";
+
+	(function(init) {
+		init(window, document);
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight,
+			mouse = {
+				x: w / 2,
+				y: h / 2
+			};
+
+/**
+ * ===============================================
+ */
+ 		function Rect(position, width, height, color) {
+ 			this.position = position;
+ 			this.width = width;
+ 			this.height = height;
+ 			this.color = color;
+ 			this.hasCollided = false;
+ 			this.colorSpeed = Math.random() * 0.2;
+ 		}
+
+ 		Rect.prototype = {
+ 			constructor: Rect,
+ 			update: function(otherRect) {
+
+ 				this.color += this.colorSpeed;
+
+ 				if(otherRect) {
+ 					if(collision.rectToRect(this, otherRect)) {
+						this.hasCollided = true;
+ 					}
+ 					else {
+ 						this.hasCollided = false;
+ 					}
+ 				}
+ 			}, 
+ 			render: function(ctx) {
+
+ 				ctx.save();
+ 				ctx.translate(this.position.x, this.position.y);
+
+ 				if(this.hasCollided) {
+ 					ctx.fillStyle = "hsla(" + this.color + ", 100%, 50%, 0.5)";		
+ 				}
+ 				else {
+ 					ctx.fillStyle = "hsl(" + this.color + ", 100%, 50%)";	
+ 				} 				
+ 				ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+ 				ctx.restore();
+ 			}
+ 		};
+/**
+ * ===============================================
+ */
+ 		var rect = null,
+ 			rects = [],
+ 			objectCount = 50,
+ 			color = Math.random() * 360;
+
+ 		var mouseRect = new Rect(
+ 				V2D.create(mouse.x, mouse.y),
+ 				20, 
+ 				20,
+ 				Math.random() * 360
+ 			);
+
+ 		mouseRect.update = function() {
+ 			this.position.x = mouse.x;
+ 			this.position.y = mouse.y;
+ 		}
+
+
+		for(var i = 0; i < objectCount; i++) {
+			rect = new Rect(
+ 				V2D.create(w * Math.random(), h * Math.random()),
+ 				-(20 + Math.random() * 100),
+ 				-(20 + Math.random() * 100),
+ 				color
+ 			);
+ 			rects.push(rect);
+		}
+
+ 		document.body.addEventListener("mousemove", function(e) {
+ 			mouse.x = e.clientX;
+ 			mouse.y = e.clientY;
+ 		});
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.fillStyle = "black";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			for(var i = 0; i < objectCount; i++) {
+ 				rect = rects[i];
+	 			rect.update(mouseRect);
+	 			rect.render(ctx); 				
+ 			}
+
+ 			mouseRect.update();
+ 			mouseRect.render(ctx);
+
+ 		});
+
+	});
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-010</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+	(function(window, document) {
+
+		"use strict";
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+
+/**
+ *===============================================
+ */		
+
+ 		function Circle(x, y, r, c) {
+ 			this.x = x;
+ 			this.y = y;
+ 			this.vx = Math.random() * 4 - 2;
+ 			this.vy = Math.random() * 4 - 2;
+ 			this.r = r;
+ 			this.c = c;
+ 			this.a = 0;
+ 			this.br = this.r;
+ 			this.as = Math.random() * 0.1;
+ 		}//END OF CIRCLE
+
+ 		Circle.prototype = {
+ 			constructor: Circle, 
+ 			update: function() {
+
+ 				this.vx += Math.random() * 1 - 0.5;
+ 				this.vy += Math.random() * 1 - 0.5;
+
+ 				this.vx *= 0.98;
+ 				this.vy *= 0.98;
+
+ 				this.x += this.vx;
+ 				this.y += this.vy;
+
+ 				this.r = this.br + Math.cos(this.a) * (this.br / 2);
+ 				this.a += this.as;
+
+ 				if(this.x < 0 || this.x > w) {
+ 					this.vx *= -1;
+ 				}
+
+ 				if(this.y < 0 || this.y > h) {
+					this.vy *= -1;
+ 				}
+
+ 			},
+ 			render: function(ctx, collidables) {
+
+ 				var collidable = null,
+ 					dx = null,
+ 					dy = null,
+ 					dist = null; 				
+
+ 				ctx.fillStyle = this.c;
+
+ 				ctx.save();
+ 				ctx.translate(this.x, this.y);
+ 				ctx.beginPath();
+ 				ctx.arc(0, 0, this.r, 0, Math.PI * 2);
+ 				ctx.fill();
+ 				ctx.restore();
+
+ 				for(var i = 0, len = collidables.length; i < len; i++) {
+
+ 					collidable = collidables[i];
+
+ 					if(this === collidable) continue;
+
+ 					dx = this.x - collidable.x;
+ 					dy = this.y - collidable.y;
+ 					dist = Math.sqrt(dx * dx + dy * dy);
+
+ 					if(dist < 100) {
+ 						ctx.strokeStyle = this.c;
+ 						ctx.beginPath();
+ 						ctx.moveTo(this.x, this.y);
+ 						ctx.lineTo(collidable.x, collidable.y);
+ 						ctx.stroke();
+ 					}
+
+ 				}  				
+
+ 			}
+ 		};
+/**
+ *===============================================
+ */		
+ 		var circle = null,
+ 			circles = [],
+ 			numObjects = 100;
+
+ 		for(var i = 0; i < numObjects; i++) {
+
+ 			circle = new Circle(
+ 				w * Math.random(), 
+ 				h * Math.random(), 
+ 				5 + Math.random() * 20, 
+ 				"hsla(" + (Math.random() * 360) + ", 100%, 50%," + (0.1 + Math.random() * 0.4) + ")"
+ 			);
+
+ 			circles.push(circle);
+ 		}
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.clearRect(0, 0, w, h);
+
+ 			for(var i = 0; i < numObjects; i++) {
+ 				circle = circles[i];
+ 				circle.update(circles);
+ 				circle.render(ctx, circles); 				
+ 			}
+
+ 		});
+
+	})(window, document)
+	</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Template</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+	
+		canvas {
+			display: block;
+			background: black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas-dom">Your browser does not support canvas element.</canvas>
+	<script src="stats.js"></script>
+	<script src="raf.js"></script>
+	<script src="x.js"></script>
+	<script>
+		(function() {
+
+/*--------------------------------------------------------CLASSES-----------------------------------------------------------------*/
+			function SampleClass(settings) {
+				//TODO properties
+			}
+
+			SampleClass.prototype = {
+				update: function() {
+					//TODO update
+				},
+				render: function(context) {
+					//TODO render
+				}
+			};
+
+/*--------------------------------------------------------HELPERS-----------------------------------------------------------------*/
+			function createDisplayObjects(classReference, len) {
+				
+				var displayObjects 	= [],
+					displayObject 	= null,
+					settings		= null;
+
+
+				for(var i = 0; i < len; i++) {
+					
+					settings = {
+						//TODO settings
+					};
+
+					displayObject = new classReference.SampleClass(settings);
+					displayObjects.push(displayObject);
+
+				}
+
+				return displayObjects;
+
+			}
+
+
+/*--------------------------------------------------------MAIN-----------------------------------------------------------------*/
+			X.Dimension.init({width: window.innerWidth, height: window.innerHeight});
+			
+			X.Stage.init({
+
+				domElement: 			document.getElementById("canvas-dom"),
+				stats: 					new Stats(),
+				displayObjects: 		createDisplayObjects({
+																SampleClass: 	SampleClass,
+																Dimension: 		X.Dimension, 
+																Converter: 		X.Converter														
+															 }, 10)
+
+			});
+
+			
+			X.Stage.animate();
+
+		})();
+	</script>
+</body>
+</html>

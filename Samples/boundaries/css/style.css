@@ -1,0 +1,69 @@
+
+html, body {
+	width: 100%;
+	height: 100%;
+}
+
+#main-container {
+	position: relative;
+	background: black;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+.circle {
+	position: absolute;
+	background: white;
+	border-radius: 50%;
+	box-shadow: 0 0 10px #FFF,
+				0 0 20px #FFF,
+				0 0 30px #FFF,
+				0 0 40px #FFDE0C,
+				0 0 70px #FFDE0C,
+				0 0 80px #FFDE0C,
+				0 0 90px #FFDE0C,
+				0 0 150px #FFDE0C;
+}
+
+.circle2 {
+	position: absolute;
+	background: white;
+	border-radius: 50%;
+	box-shadow: 0 0 10px #FFF,
+				0 0 20px #FFF,
+				0 0 30px #FFF,
+				0 0 40px #9DFF0D,
+				0 0 70px #9DFF0D,
+				0 0 80px #9DFF0D,
+				0 0 90px #9DFF0D,
+				0 0 150px #9DFF0D;
+}
+
+.circle3 {
+	position: absolute;
+	background: white;
+	border-radius: 50%;
+	box-shadow: 0 0 10px #FFF,
+				0 0 20px #FFF,
+				0 0 30px #FFF,
+				0 0 40px #02D5FF,
+				0 0 70px #02D5FF,
+				0 0 80px #02D5FF,
+				0 0 90px #02D5FF,
+				0 0 150px #02D5FF;
+}
+
+.circle4 {
+	position: absolute;
+	background: white;
+	border-radius: 50%;
+	box-shadow: 0 0 10px #FFF,
+				0 0 20px #FFF,
+				0 0 30px #FFF,
+				0 0 40px #E600FF,
+				0 0 70px #E600FF,
+				0 0 80px #E600FF,
+				0 0 90px #E600FF,
+				0 0 150px #E600FF;
+}

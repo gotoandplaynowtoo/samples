@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-017</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+
+	"use strict";
+
+	(function(init) {
+
+		init(window, document);
+
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight,
+			mouse = {
+				x: w / 2, 
+				y: h / 2
+			},
+			follower = {
+				x: mouse.x,
+				y: mouse.y,
+				px: mouse.x,
+				py: mouse.y
+			};
+
+/**
+ *================================================
+ */
+
+ 		document.addEventListener("mousemove", function(e) {
+ 			mouse.x = e.clientX;
+ 			mouse.y = e.clientY;
+ 		});
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			follower.px = follower.x;
+ 			follower.py = follower.y;
+
+ 			follower.x += (mouse.x - follower.x) * 0.2;
+ 			follower.y += (mouse.y - follower.y) * 0.2;
+
+ 			ctx.lineWidth = Math.random() * 10;
+ 			ctx.beginPath();
+ 			ctx.moveTo(follower.x, follower.y);
+ 			ctx.lineTo(follower.px, follower.py);
+ 			ctx.stroke();
+
+ 		});
+
+	});
+	</script>
+</body>
+</html>

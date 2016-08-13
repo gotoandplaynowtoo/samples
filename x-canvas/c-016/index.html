@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-016</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script src="../utility/V2D-v0.1.js"></script>
+	<script>
+
+	"use strict";
+
+	(function(init) {
+		init(window, document, window.V2D);
+	})(function(window, document, V2D, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+/**
+ *=========================================
+ */		
+
+ 		function Particle(position, velocity, mass, radius, attractors) {
+ 			this.position = position;
+ 			this.velocity = velocity;
+ 			this.mass = mass;
+ 			this.radius = radius;
+ 			this.attractors = attractors || null;
+ 			this.prevPos = V2D.create(this.position.x, this.position.y);
+ 		}
+
+ 		Particle.prototype = {
+ 			constructor: Particle, 
+ 			gravitateTo: function(p) {
+ 				var len = V2D.dist(p.position, this.position),
+ 					angle = V2D.angleTo(p.position, this.position);
+
+ 				var gravity = V2D.create(0, 0);
+
+ 				gravity.setLength(p.mass / (len * len));
+ 				gravity.setAngle(angle);
+
+ 				this.velocity.add(gravity);
+ 			},
+ 			update: function() {
+
+ 				if(this.attractors !== null) {
+ 					for(var i = 0, len = this.attractors.length; i < len; i++) {
+ 						this.gravitateTo(this.attractors[i]);
+ 					}
+ 				}
+
+
+ 				this.prevPos.x = this.position.x;
+ 				this.prevPos.y = this.position.y;
+ 				this.position.add(this.velocity);
+
+				if(this.position.x > w) {
+					this.position.x = 0;
+					this.velocity.setLength(Math.random() * 10);
+					this.velocity.setAngle(Math.random() * Math.PI * 2);
+ 					this.prevPos.x = 0;
+				}
+				else if(this.position.x < 0) {
+					this.position.x = w;
+					this.prevPos.x = w;
+					this.velocity.setLength(Math.random() * 10);
+					this.velocity.setAngle(Math.random() * Math.PI * 2);
+				}
+
+				if(this.position.y > h) {
+					this.position.y = 0;
+					this.prevPos.y = 0;
+					this.velocity.setLength(Math.random() * 10);
+					this.velocity.setAngle(Math.random() * Math.PI * 2);					
+				}
+				else if(this.position.y < 0) {
+					this.position.y = h;
+					this.prevPos.y = h;
+					this.velocity.setLength(Math.random() * 10);
+					this.velocity.setAngle(Math.random() * Math.PI * 2);					
+				}
+
+
+ 			},
+ 			render: function(ctx) {
+
+ 				ctx.fillStyle = "white";
+ 				ctx.beginPath();
+ 				ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+ 				ctx.fill();
+
+				ctx.strokeStyle = "white";
+ 				ctx.beginPath();
+ 				ctx.moveTo(this.position.x, this.position.y);
+ 				ctx.lineTo(this.prevPos.x, this.prevPos.y);
+ 				ctx.stroke(); 				
+ 			}
+
+ 		};
+
+/**
+ *=========================================
+ */	
+ 		function createParticle(count, callback) {
+
+ 			var particle = null,
+ 				particles = [];
+
+ 			for(var i = 0; i < count; i++) {
+ 				particle = callback();
+ 				particles.push(particle);
+ 			}
+
+ 			return particles;
+ 		}
+
+ 		function updateRender(particles, ctx) {
+ 			for(var i = 0, len = particles.length; i < len; i++) {
+ 				particles[i].update();
+ 				particles[i].render(ctx);
+ 			} 			
+ 		}
+
+/**
+ *=========================================
+ */		
+ 		var attractors = createParticle(5, function() {
+ 			return new Particle(
+ 					V2D.create(w * Math.random(), h * Math.random()), 
+ 					V2D.create(0, 0), 
+ 					1000, 
+ 					5,
+ 					null
+ 				);
+ 		});
+
+ 		var particles = createParticle(50, function() {
+ 			return new Particle(
+ 					V2D.create(w * Math.random(), h * Math.random()), 
+ 					V2D.create(Math.random() * 10 - 5, Math.random() * 10 - 5),
+ 					1, 
+ 					0, 
+ 					attractors
+ 				);
+ 		});
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+ 			ctx.fillRect(0, 0, w, h);
+
+			updateRender(particles, ctx);
+			updateRender(attractors, ctx);
+
+
+ 		});
+
+	});
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Exp 9</title>
+	<style type="text/css">
+		body
+		{
+			margin: 0;
+			padding: 0;
+		}
+		
+		#canvas2D {
+			display: block;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas2D"></canvas>
+	<script type="text/javascript" src="requestanimframe.js"></script>
+	<script type="text/javascript">
+		var canvas2D = null;
+		var context2D = null;
+		var clearScreenColor = null;
+		var balls = [];
+		
+		
+		document.body.onload = init;
+		
+	
+		function init()
+		{
+			//initialize canvas2D
+			canvas2D = document.getElementById("canvas2D");
+			canvas2D.width = window.innerWidth;
+			canvas2D.height = window.innerHeight;
+			
+			//initialize context2D
+			context2D = canvas2D.getContext("2d");
+			
+			//initialize clearScreen color
+			clearScreenColor = "rgba(0, 0, 0, 0.3)";
+			
+			var ball = null;
+			var posX = 8;
+			var posY = 10;
+			var maxBallX = 50;
+			var maxBallY = 50;
+			var incX = window.innerWidth / maxBallX + 5;
+			var incY = window.innerHeight / maxBallY + 5;
+			var angleInc = Math.PI / (maxBallX * maxBallY) + 0.5;
+			
+			
+			var angle = 0;
+			
+			for(var i = 0; i < maxBallY; i++)
+			{
+			
+				for(var j = 0; j < maxBallX; j++)
+				{
+					ball = new Ball(posX, posY, 5, "#00bbff");
+					ball.oscillationRange = 5;
+					ball.angleInc = 0.1;
+					ball.angle = angle;
+					angle += angleInc;
+					balls.push(ball);				
+					posX += incX;
+				}
+				posX = 8;
+				posY += incY;
+			
+			}
+			
+			
+			frameLoop();
+		}
+		
+		function frameLoop()
+		{
+			
+			clearScreen();			
+			drawObjects();
+			requestAnimFrame(frameLoop);
+		}
+		
+		
+		function drawObjects()
+		{
+			var len = balls.length;
+			
+			for(var i = 0; i < len; i++)
+			{
+				balls[i].update();
+				balls[i].render();
+			}
+		}
+				
+		function Ball(x, y, rad, color)
+		{
+			this.x = x;
+			this.y = y;
+			this.rad = rad;
+			this.color = color;
+			this.vx = 0;
+			this.vy = 0;
+			this.angle = 0;
+			this.angleInc = 0;
+			this.mainRad = rad;
+			this.oscillationRange = 0;
+			
+			this.render = function()
+			{
+				context2D.fillStyle = this.color;
+				context2D.beginPath();
+				context2D.arc(this.x, this.y, this.rad, 0, Math.PI * 2, false);
+				context2D.closePath();
+				context2D.fill();
+			};
+			
+			
+			this.update = function()
+			{
+				this.rad = this.mainRad + Math.cos(this.angle) * this.oscillationRange;
+				this.angle += this.angleInc;
+			};
+		}
+		
+		
+		function clearScreen()
+		{	
+			context2D.fillStyle = clearScreenColor;
+			context2D.fillRect(0, 0, window.innerWidth, window.innerHeight);
+		}
+		
+		
+		function randRange(min, max)
+		{
+			return Math.random() * (max - min) + min;
+		}
+		
+	</script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Exp 12</title>
+	<style type="text/css">
+		body
+		{
+			margin: 0;
+			padding: 0;
+		}
+		
+		#canvas2D {
+			display: block;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas2D"></canvas>
+	<script type="text/javascript" src="requestanimframe.js"></script>
+	<script type="text/javascript">
+		var canvas2D = null;
+		var context2D = null;
+		var clearScreenColor = null;
+		var points = [];
+
+		
+		document.body.onload = init;
+		
+	
+		function init()
+		{
+			//initialize canvas2D
+			canvas2D = document.getElementById("canvas2D");
+			canvas2D.width = window.innerWidth;
+			canvas2D.height = window.innerHeight;
+			
+			//initialize context2D
+			context2D = canvas2D.getContext("2d");
+			
+			clearScreenColor = "#000000";
+			clearScreen();
+			
+			var centerX = window.innerWidth / 2;
+			var centerY = window.innerHeight / 2;
+			
+			var point = new Point(centerX, centerY, 1, "#ff00ff", 5);
+			point.centerX = centerX;
+			point.centerY = centerY;
+			point.angleInc = 1;
+			point.oscillationInc = 0.5;
+			
+			points.push(point);
+			
+			frameLoop();
+		}
+		
+		function frameLoop()
+		{
+			drawObjects();
+			requestAnimFrame(frameLoop);
+		}
+		
+		
+		function drawObjects()
+		{
+			var len = points.length;
+			
+			for(var i = 0; i < len; i++)
+			{
+				points[i].update();
+				points[i].render();
+			}
+		}
+				
+		function Point(x, y, width, color, oscillationRange)
+		{
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.color = color;
+			this.centerX = 0;
+			this.centerY = 0;
+			this.angle = 0;
+			this.angleInc = 0;
+			this.oscillationRange = oscillationRange;
+			this.oscillationInc = 0;
+
+			context2D.strokeStyle = this.color;
+			context2D.lineWidth = this.width;
+			context2D.beginPath();
+			context2D.moveTo(this.x + this.oscillationRange, this.y);
+			
+			
+			this.render = function()
+			{
+				context2D.lineTo(this.x, this.y);
+				context2D.stroke();
+			};
+			
+			
+			this.update = function()
+			{
+				this.x = this.centerX + Math.cos(this.angle) * this.oscillationRange;
+				this.y = this.centerY + Math.sin(this.angle) * this.oscillationRange;
+				
+				this.angle += this.angleInc;
+				this.oscillationRange += this.oscillationInc;
+			};
+		}
+		
+		
+		
+		function clearScreen()
+		{	
+			context2D.fillStyle = clearScreenColor;
+			context2D.fillRect(0, 0, window.innerWidth, window.innerHeight);
+		}
+		
+		
+		function randRange(min, max)
+		{
+			return Math.random() * (max - min) + min;
+		}
+		
+	</script>
+</body>
+</html>

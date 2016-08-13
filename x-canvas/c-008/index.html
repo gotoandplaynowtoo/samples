@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-008</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+	(function(window, document) {
+
+		"use strict";
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight,
+			mouse = {
+				x: w / 2,
+				y: h / 2
+			};
+
+/**
+ *========================================
+ */		
+ 		function Arrow(x, y) {
+ 			this.x = x;
+ 			this.y = y;
+ 			this.px = this.x;
+ 			this.py = this.y;
+ 			this.vx = 0;
+ 			this.vy = 0;
+ 			this.ax = 0;
+ 			this.ay = 0;
+ 			this.acceleration = 0.8;
+ 			this.friction = 0.98;
+ 			this.angle = 0;
+ 			this.points = {
+ 				p1: {x: 10, y: 0},
+ 				p2: {x: -10, y: 10},
+ 				p3: {x: -10, y: -10}
+ 			};
+ 		}
+
+ 		Arrow.prototype = {
+ 			constructor: Arrow,
+ 			update: function() {
+
+ 				var dx = mouse.x - this.x,
+ 					dy = mouse.y - this.y;
+
+ 				this.angle = Math.atan2(dy, dx);
+
+ 				this.ax = Math.cos(this.angle) * this.acceleration;
+ 				this.ay = Math.sin(this.angle) * this.acceleration; 	
+
+ 				this.vx += this.ax;
+ 				this.vy += this.ay;			
+
+ 				this.vx *= this.friction;
+ 				this.vy *= this.friction;
+ 				
+				this.px = this.x;
+				this.py = this.y;
+
+				if(Math.sqrt(dx * dx + dy * dy) > 0.5) {
+
+		 			this.x += this.vx;
+	 				this.y += this.vy;
+	 			}
+ 			
+
+ 			},
+ 			render: function(ctx) {
+
+ 				ctx.save();
+
+ 				ctx.translate(this.x, this.y);
+ 				ctx.rotate(this.angle);
+ 				ctx.scale(0.5, 0.5);
+
+ 				ctx.beginPath();
+ 				ctx.moveTo(this.points.p1.x, this.points.p1.y);
+ 				ctx.lineTo(this.points.p3.x, this.points.p3.y);
+ 				ctx.lineTo(this.points.p2.x, this.points.p2.y);
+ 				ctx.closePath();
+ 				ctx.stroke();
+
+ 				ctx.restore();
+
+ 				ctx.beginPath();
+ 				ctx.moveTo(this.x, this.y);
+ 				ctx.lineTo(this.px, this.py);
+ 				ctx.stroke(); 				
+
+ 			}
+ 		};
+
+/**
+ *========================================
+ */		
+ 		var arrow = null, 
+ 			arrows = [], 
+ 			numObjects = 500;
+
+ 		for(var i = 0; i < numObjects; i++) {
+			arrow = new Arrow(Math.random() * w, Math.random() * h);
+			arrows.push(arrow);
+ 		}
+
+ 		document.addEventListener("mousemove", function(e) {
+ 			mouse.x = e.clientX;
+ 			mouse.y = e.clientY;
+ 		});
+
+		ctx.globalAlpha = 0.5;
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			for(var i = 0; i < numObjects; i++) {
+ 				arrow = arrows[i];
+	 			arrow.update();
+	 			arrow.render(ctx); 				
+ 			}
+
+ 		});
+
+	})(window, document);
+	</script>
+</body>
+</html>

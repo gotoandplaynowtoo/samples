@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-001</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+	(function(window, document, undefined) {
+
+		"use strict";
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight,
+			mouse = {
+				x: w / 2,
+				y: h / 2
+			},
+			pointFollower = {
+				x: mouse.x, 
+				y: mouse.y
+			},
+			bRect = c.getBoundingClientRect();
+
+/**
+ * ======================================================
+ */			
+
+		function Circle(x, y, r, c, ex, ey) {
+			this.x = x; 
+			this.y = y;
+			this.px = x;
+			this.py = y;
+			this.r = r;
+			this.c = c;
+			this.ex = ex;
+			this.ey = ey;
+			this.vx = 0;
+			this.vy = 0;
+		}//END OF CIRCLE CONSTRUCTOR
+
+		Circle.prototype = {
+			constructor: Circle, 
+			render: function(ctx) {
+
+				ctx.save();
+				ctx.translate(this.x, this.y);
+				ctx.fillStyle = this.c; 
+				ctx.beginPath();
+				ctx.arc(0, 0, this.r, 0, Math.PI * 2);
+				ctx.fill();
+				ctx.restore();
+
+				ctx.strokeStyle = this.c;
+				ctx.lineWidth = this.r;
+				ctx.beginPath();
+				ctx.moveTo(this.px, this.py);
+				ctx.lineTo(this.x, this.y);
+				ctx.stroke();
+
+
+			},//END OF RENDER FUNCTION
+			update: function(target) {
+
+				var dx = target.x - this.x,
+					dy = target.y - this.y;
+
+				this.vx = dx * this.ex;
+				this.vy = dy * this.ey;
+
+				this.px = this.x;
+				this.py = this.y;
+
+				this.x += this.vx;
+				this.y += this.vy
+
+			}//END OF UPDATE FUNCTION
+		};//END OF CIRCLE PROTOTYPE
+
+/**
+ * ======================================================
+ */
+
+		var circles = [],
+			circleCount = 100;
+
+		var temp = null;
+
+		for(var i = 0; i < circleCount; i++) {
+
+			temp = new Circle(
+				w * Math.random(), 
+				h * Math.random(), 
+				Math.random() * 10, 
+				"hsl(" + (Math.random() * 360) + ", 100%, 50%)",
+				Math.random(),
+				Math.random()
+			);
+
+			circles.push(temp);
+		}//END OF FOR LOOP
+
+		document.addEventListener("mousemove", function(e) {
+
+			mouse.x = e.clientX - bRect.left;
+			mouse.y = e.clientY - bRect.top;
+
+		});
+
+		requestAnimationFrame(function frame() {
+
+			requestAnimationFrame(frame);
+
+			ctx.globalCompositeOperation = "source-over";
+			ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+			ctx.fillRect(0, 0, w, h);
+			ctx.globalCompositeOperation = "lighter";
+
+			var dx = (mouse.x - pointFollower.x),
+				dy = (mouse.y - pointFollower.y);
+
+			pointFollower.x += dx * 0.1;
+			pointFollower.y += dy * 0.1;
+
+			var circle = null;
+			for(var i = 0, len = circles.length; i < len; i++) {
+				circle = circles[i];
+				circle.update(pointFollower);
+				circle.render(ctx);	
+			}//END OF FOR LOOP
+
+		});//END OF REQUEST ANIMATION FRAME
+
+	})(window, window.document); //END OF IIFE
+	</script>
+</body>
+</html>

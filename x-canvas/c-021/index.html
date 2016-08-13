@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-021</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+
+	"use strict";
+
+	(function(init) {
+
+		init(window, document);
+
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+
+/**
+ *=======================================================
+ */		
+ 		function lerp(norm, min, max) {
+ 			return (max - min) * norm + min;
+ 		}
+
+ 		function Circle(x, y, r, color) {
+ 			this.x = x;
+ 			this.y = y;
+ 			this.r = r;
+ 			this.color = color;
+ 			this.alpha = 1;
+ 			this.brightness = 50;
+ 			this.norm = 0;
+ 			this.angleX = (Math.PI * 2) * Math.random();
+ 			this.angleY = (Math.PI * 2) * Math.random();
+ 			this.scale = 0;
+ 			this.range = 0;
+ 			this.angleSpeedX = Math.random() * 0.2 - 0.1;
+ 			this.angleSpeedY = Math.random() * 0.2 - 0.1;
+ 			this.delay = Math.random() * 500;
+ 			this.delayCtr = 0;
+ 			this.normSpeed = Math.random() * 0.05;
+ 			this.bRangeX = 100 + Math.random() * 200;
+ 			this.bRangeY = 100 + Math.random() * 200;
+ 			this.rangeX = 0;
+ 			this.rangeY = 0;
+ 		}
+
+ 		Circle.prototype = {
+ 			constructor: Circle,
+ 			update: function() {
+
+ 				this.delayCtr += 1;
+ 				if(this.delayCtr <= this.delay) return;
+
+ 				this.x = w / 2 + Math.cos(this.angleX) * this.rangeX;
+ 				this.y = h / 2 + Math.sin(this.angleY) * this.rangeY;
+ 				this.angleX += this.angleSpeedX;
+ 				this.angleY += this.angleSpeedY;
+
+ 				this.norm += this.normSpeed;
+ 				this.alpha = lerp(this.norm, 1, 0);
+ 				this.brightness = lerp(this.norm, 50, 100);
+ 				this.scale = lerp(this.norm, 0, 10);
+
+ 				this.rangeX = lerp(this.norm, 0, this.bRangeX);
+ 				this.rangeY = lerp(this.norm, 0, this.bRangeY);
+
+ 				if(this.norm >= 1) {
+ 					this.norm = 0;
+ 				}
+
+
+ 			},
+ 			render: function(ctx) {
+
+ 				ctx.globalAlpha = this.alpha;
+
+ 				ctx.save();
+ 				ctx.translate(this.x, this.y);
+ 				ctx.scale(this.scale, this.scale);
+ 				ctx.fillStyle = "hsl(" + this.color + ", 100%, 50%)";
+ 				ctx.beginPath();
+ 				ctx.arc(0, 0, this.r, 0, Math.PI * 2);
+ 				ctx.fill();
+ 				ctx.restore();
+
+ 			}
+ 		};
+
+
+/**
+ *=======================================================
+ */		 
+
+ 		var circle = null, 
+ 			circles = [],
+ 			objectCount = 10;
+
+ 		for(var i = 0; i < objectCount; i++) {
+	 		circle = new Circle(
+	 				w / 2, 
+	 				h / 2, 
+	 				10, 
+	 				Math.random() * 360
+	 			);	 			
+
+	 		circles.push(circle);
+ 		}
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.globalCompositeOperation = "source-over";
+ 			ctx.fillStyle = "rgba(0, 0, 0, 1)";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			ctx.globalCompositeOperation = "lighter";
+ 			for(var i = objectCount-1; i >= 0; i--) {
+ 				circle = circles[i];
+ 				circle.update();
+ 				circle.render(ctx); 				
+ 			}
+
+ 		});
+
+
+	});
+
+	</script>
+</body>
+</html>

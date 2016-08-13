@@ -1,0 +1,156 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Exp 2</title>
+	<style type="text/css">
+		body
+		{
+			margin: 0;
+			padding: 0;
+		}
+		
+		#canvas2D {
+			display: block;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas2D"></canvas>
+	<script type="text/javascript" src="requestanimframe.js"></script>
+	<script type="text/javascript">
+		var canvas2D = null;
+		var context2D = null;
+		var clearScreenColor = null;
+		var maxBall = 50;
+		var frequency = 10;
+		var balls = [];
+		
+		document.body.onload = init;
+		
+	
+		function init()
+		{
+			//initialize canvas2D
+			canvas2D = document.getElementById("canvas2D");
+			canvas2D.width = window.innerWidth;
+			canvas2D.height = window.innerHeight;
+			
+			//initialize context2D
+			context2D = canvas2D.getContext("2d");
+			
+			//initialize clearScreen color
+			clearScreenColor = "rgba(0, 0, 0, 0.1)";
+		
+		
+			var ball = new Ball(0, randRange(5, window.innerHeight), randRange(5, 10), "#ff0000");
+		
+			ball.vx = randRange(5, 10);
+			ball.vy = randRange(0.1, 0.5);
+			ball.oscillationRange = randRange(3, 5);			
+			balls.push(ball);
+			
+			frameLoop();
+		}
+		
+		function frameLoop()
+		{
+			
+			clearScreen();
+			if(Math.floor(Math.random() * frequency) === 0)
+			{
+				createBall();
+			}
+			
+			drawObjects();
+			requestAnimFrame(frameLoop);
+		}
+		
+		function createBall()
+		{
+			var len = balls.length;
+			var ball = null;
+			
+			if(len < maxBall)
+			{
+				ball = new Ball(0, randRange(0, window.innerHeight), randRange(5, 10), "#ff0000");
+				
+				ball.vx = randRange(5, 10);
+				ball.vy = randRange(0.1, 0.5);
+				ball.oscillationRange = randRange(3, 5);
+				balls.push(ball);
+			}
+		}
+		
+		function drawObjects()
+		{
+			var len = balls.length;
+			
+			for(var i = 0; i < len; i++)
+			{
+				balls[i].update();
+				balls[i].render();
+				if(balls[i].x > window.innerWidth)
+				{
+					resetProperties(balls[i]);
+				}
+			}
+		}
+		
+		function resetProperties(ball)
+		{
+			ball.x = -5;
+			ball.y = randRange(0, window.innerHeight);
+			ball.vx = randRange(5, 10);
+			ball.vy = randRange(0.1, 0.5);
+			ball.rad = randRange(5, 10);
+		}
+		
+		
+		
+		function Ball(x, y, rad, color)
+		{
+			this.x = x;
+			this.y = y;
+			this.rad = rad;
+			this.color = color;
+			this.vx = 0;
+			this.vy = 0;
+			this.angle = 0;
+			this.oscillationRange = 0;
+			this.centerY = y;
+			
+			this.render = function()
+			{
+				context2D.fillStyle = this.color;
+				context2D.beginPath();
+				context2D.arc(this.x, this.y, this.rad, 0, Math.PI * 2, false);
+				context2D.closePath();
+				context2D.fill();
+			};
+			
+			
+			this.update = function()
+			{
+				this.x += this.vx;
+				this.y = this.centerY + Math.sin(this.angle) * this.oscillationRange;
+				this.angle += this.vy;
+			};
+		}
+		
+		
+		function clearScreen()
+		{	
+			context2D.fillStyle = clearScreenColor;
+			context2D.fillRect(0, 0, window.innerWidth, window.innerHeight);
+		}
+		
+		
+		function randRange(min, max)
+		{
+			return Math.random() * (max - min) + min;
+		}
+		
+	</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-004</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+	(function(window, document, undefined) {
+
+		"use strict";
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+
+/**
+ * ======================================================
+ */	
+ 		function Square(x, y, size, c, a) {
+ 			this.x = x;
+ 			this.y = y;
+ 			this.size = size;
+ 			this.c = c;
+ 			this.a = a;
+ 			this.bSize = this.size;
+ 		}//END OF SQUARE PROTOTYPE
+
+ 		Square.prototype = {
+ 			constructor: Square,
+ 			update: function() {
+ 				this.a += 0.5;
+ 				this.c += 1;
+ 				this.size = this.bSize + Math.sin(this.a * 0.1) * 20;
+ 			},
+ 			render: function(ctx) {
+ 				ctx.save();
+ 				ctx.translate(this.x, this.y);
+ 				ctx.rotate(this.a * Math.PI / 180);
+ 				ctx.fillStyle = "hsla(" + (this.c) + ", 100%, 50%, 0.6)",
+ 				ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+ 				ctx.restore();
+ 			}
+ 		};
+
+/**
+ * ======================================================
+ */	
+ 		var squares = [],
+ 			squareCount = w / 10,
+ 			square = null,
+ 			centerY = h / 2,
+ 			angle = 0,
+ 			angleInc = 5;
+
+ 		for(var i = 0; i < squareCount; i++) {
+
+ 			square = new Square(
+ 					i * 15,
+ 					centerY + Math.sin(angle * Math.PI / 180) * 200,
+ 					100 + Math.sin(angle * Math.PI / 180) * 50,
+ 					angle,
+ 					angle
+ 				);
+
+ 			angle += angleInc;
+
+ 			squares.push(square);
+
+ 		}//END OF FOR LOOP
+
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			for(var i = 0, len = squares.length; i < len; i++) {
+ 				square = squares[i];
+	 			square.update();
+	 			square.render(ctx); 				
+ 			}//END OF FOR LOOP
+
+ 		});//END OF REQUEST ANIMATION FRAME
+
+	})(window, document);
+	</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-006</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+	(function(window, document, undefined) {
+
+		"use strict";
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+
+/**
+ *=======================================================
+ */
+ 		function Point(cx, cy, rx, ry) {
+ 			this.x = null;
+ 			this.y = null;
+ 			this.cx = cx;
+ 			this.cy = cy;
+ 			this.angleX = 0;
+ 			this.angleY = 0;
+
+ 			var speed = 0.1 * Math.random() + 0.01;
+
+ 			this.angleSpeedX = speed
+ 			this.angleSpeedY = speed;
+ 			this.rx = rx;
+ 			this.ry = ry;
+ 			this.x = this.cx + Math.cos(this.angleX) * this.rx;
+ 			this.y = this.cy + Math.sin(this.angleY) * this.ry;
+ 			this.px = this.x;
+ 			this.py = this.y; 			
+ 		}
+
+ 		Point.prototype = {
+ 			constructor: Point,
+ 			update: function() {
+
+ 				this.px = this.x;
+ 				this.py = this.y;
+
+ 				this.x = this.cx + Math.cos(this.angleX) * this.rx;
+ 				this.y = this.cy + Math.sin(this.angleY) * this.ry;
+
+				this.angleX += this.angleSpeedX; 	
+				this.angleY += this.angleSpeedY; 	
+
+
+ 			},
+ 			render: function(ctx) {
+ 				ctx.beginPath();
+ 				ctx.strokeStyle = "white";
+ 				ctx.moveTo(this.px, this.py);
+ 				ctx.lineTo(this.x, this.y);
+ 				ctx.stroke();
+ 			}
+ 		}
+
+
+/**
+ *=======================================================
+ */	
+ 		var point,
+ 			points = [],
+ 			numObjects = 200;
+
+ 		for(var i = 0; i < numObjects; i++) {
+
+			point = new Point(
+				w / 2, 
+				h / 2, 
+				Math.random() * 300, 
+				Math.random() * 300
+			);
+
+			points.push(point);
+ 		}
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.fillStyle = "rgba(0, 0, 0, 0.02)";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			for(var i = 0, len = points.length; i < len; i++) {
+ 				point = points[i];
+ 				point.update();
+ 				point.render(ctx); 				
+ 			}
+
+ 		});	 
+
+	})(window, document);
+	</script>
+</body>
+</html>

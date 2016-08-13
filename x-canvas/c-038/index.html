@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-038</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script src="../utility/V2D-v0.1.js"></script>
+	<script>
+	"use strict";
+	(function(init) {
+		init(window, document);
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight,
+			mouse = {
+				x: 0,
+				y: 0
+			};
+
+/**
+ * ==========================================
+ */
+ 		function Circle(position, radius, color) {
+ 			this.position = position;
+ 			this.radius = radius;
+ 			this.color = color;
+ 			this.baseColor = color;
+ 			this.baseRadius = radius;
+ 		}
+
+ 		Circle.prototype = {
+ 			constructor: Circle, 
+ 			update: function() {
+
+ 				var dist = V2D.dist(mouse, this.position);
+
+ 				if(dist < this.radius) {
+ 					this.color = "#E91E63";
+ 					this.radius += ((this.baseRadius + 100) - this.radius) * 0.2;
+ 				}
+ 				else {
+ 					this.color = this.baseColor;
+ 					this.radius += (this.baseRadius - this.radius) * 0.2;
+ 				}
+
+ 			},
+ 			render: function(ctx) {
+ 				ctx.save();
+ 				ctx.translate(this.position.x, this.position.y);
+ 				ctx.beginPath();
+ 				ctx.fillStyle = this.color;
+ 				ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+ 				ctx.fill();
+ 				ctx.restore();
+ 			}
+ 		};
+/**
+ * ==========================================
+ */ 
+ 		var circle = new Circle(
+ 				V2D.create(w / 2, h / 2),
+ 				50,
+ 				"#3F51B5"
+ 			);
+
+ 		document.body.addEventListener("mousemove", function(e) {
+ 			mouse.x = e.clientX;
+ 			mouse.y = e.clientY;
+ 		});
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.clearRect(0, 0, w, h);
+
+ 			circle.update();
+ 			circle.render(ctx);
+
+ 		});
+
+	});
+	</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-043</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script src="../utility/V2D-v0.1.js"></script>
+	<script>
+	"use strict";
+	(function(init) {
+		init(window, document)
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+
+/**
+ * ===============================================
+ */
+ 		function Shape(position, velocity, radius, color) {
+ 			this.position = position;
+ 			this.velocity = velocity;
+ 			this.radius = radius;
+ 			this.color = color;
+ 			this.baseRadius = radius;
+ 			this.radiusAngle = 0;
+ 		}
+
+ 		Shape.prototype = {
+ 			constructor: Shape,
+ 			update: function() {
+
+ 				this.position.add(this.velocity);
+ 				this.color += 0.2;
+
+ 				this.radius = this.baseRadius + Math.cos(this.radiusAngle) * (this.baseRadius / 2);
+ 				this.radiusAngle += Math.random() * 0.1;
+
+ 				if(this.position.x > w || this.position.x < 0) {
+ 					this.velocity.x *= -1;
+ 				}
+
+ 				if(this.position.y > h || this.position.y < 0) {
+					this.velocity.y *= -1;
+ 				}
+
+ 			}, 
+ 			render: function(ctx) {
+
+ 				var ctr = 1 + Math.random() * 10;
+ 				var angleSlice = (360 / ctr) * Math.PI / 180;
+
+ 				ctx.strokeStyle = "hsl(" + this.color + ", 100%, 50%)";
+ 				ctx.lineWidth = Math.random() * 2;
+ 				ctx.beginPath();
+ 				ctx.moveTo(
+ 						this.position.x + Math.cos(0) * this.radius,
+ 						this.position.y + Math.sin(0) * this.radius
+ 					);
+
+ 				for(var i = 0; i < ctr; i++) {
+	 				ctx.lineTo(
+	 						this.position.x + Math.cos(i * angleSlice) * this.radius,
+	 						this.position.y + Math.sin(i * angleSlice) * this.radius
+	 					);
+ 				}
+
+ 				ctx.closePath();
+ 				ctx.stroke();
+ 			}
+ 		};
+ 		
+/**
+ * ===============================================
+ */ 
+ 		var shape = null,
+ 			shapes = [],
+ 			objectCount = 50,
+ 			color = Math.random() * 360;
+
+ 		for(var i = 0; i < objectCount; i++) {
+
+			var shape = new Shape(
+ 				V2D.create(w * Math.random(), h * Math.random()),
+ 				V2D.create(Math.random() * 10 - 5, Math.random() * 10 - 5),
+ 				5 + Math.random() * 25,
+ 				color
+ 			);
+
+ 			shapes.push(shape);
+
+ 		}
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.fillStyle = "black";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			for(var i = 0; i < objectCount; i++) {
+ 				shape = shapes[i];
+	 			shape.update();
+	 			shape.render(ctx); 				
+ 			}
+
+ 		});
+
+	});
+	</script>
+</body>
+</html>

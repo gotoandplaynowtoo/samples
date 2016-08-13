@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-041</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script src="../utility/V2D-v0.1.js"></script>
+	<script src="../utility/collision.js"></script>
+	<script>
+	"use strict";
+	(function(init) {
+		init(window, document)
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight,
+			mouse = {
+				x: 0,
+				y: 0
+			};
+
+/**
+ * =================================================
+ */
+ 		function Rect(position, width, height, color) {
+ 			this.position = position;
+ 			this.width = width;
+ 			this.height = height;
+ 			this.color = color;
+ 			this.colorSpeed = Math.random() * 0.5;
+ 		}
+
+ 		Rect.prototype = {
+ 			constructor: Rect,
+ 			update: function() {
+ 				this.color += this.colorSpeed;
+ 			},
+ 			render: function(ctx) {
+
+ 				if(collision.rectToPoint(this, mouse)) {
+ 					ctx.fillStyle = "hsla(" + this.color + ", 100%, 50%, 0.6)";
+ 				}
+ 				else {
+ 					ctx.fillStyle = "hsl(" + this.color + ", 100%, 50%)";
+ 				}
+
+ 				ctx.save();
+ 				ctx.translate(this.position.x, this.position.y);
+ 				ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+ 				ctx.restore();
+ 			}
+ 		};
+/**
+ * =================================================
+ */
+ 		var rect = null,
+ 			rects = [],
+ 			objectCount = 200,
+ 			color = Math.random() * 360;
+
+ 		for(var i = 0; i < objectCount; i++) {
+
+			rect = new Rect(
+ 				V2D.create(w * Math.random(), h * Math.random()),
+ 				5 + Math.random() * 100,
+ 				5 + Math.random() * 100,
+ 				color
+ 			);
+
+ 			rects.push(rect);
+
+ 		}
+
+/**
+ * =================================================
+ */
+
+ 		document.addEventListener("mousemove", function(e) {
+ 			mouse.x = e.clientX;
+ 			mouse.y = e.clientY;
+ 		});
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.fillStyle = "black";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			for(var i = 0; i < objectCount; i++) {
+ 				rect = rects[i];
+ 				rect.update();
+ 				rect.render(ctx); 				
+ 			}
+
+ 		});
+
+	});
+	</script>
+</body>
+</html>

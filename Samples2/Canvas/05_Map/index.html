@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Map</title>
+	<style>
+
+	* {
+		padding: 0;
+		margin: 0;
+	}
+
+	html, body {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	body {
+		background: #eee;
+	}
+
+	canvas {
+		background: white;
+		display: block;
+	}
+
+	.canvas-container {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+
+	</style>
+</head>
+<body>
+	<div class="canvas-container">
+		<canvas id="c"></canvas>
+	</div>
+	<script>
+	"use strict";
+	;(function(main) {
+		main(window, document);
+	})(function(window, document) {
+
+		var canvas = document.getElementById("c"),
+			context = canvas.getContext("2d"),
+			width = canvas.width = 960,
+			height = canvas.height = 600;
+/**
+ * ===================================================
+ */
+ 		function normalize(value, min, max) {
+ 			return (value - min) / (max - min);
+ 		}
+
+ 		function lerp(value, min, max) {
+ 			return (max - min) * value + min;
+ 		}
+
+ 		function map(value, smin, smax, dmin, dmax) {
+ 			var norm = normalize(value, smin, smax);
+ 			return lerp(norm, dmin, dmax);
+ 		}
+
+/**
+ * ===================================================
+ */ 
+ 		var rect = {
+ 			x: 0,
+ 			y: height / 2 - 5,
+ 			width: 0,
+ 			height: 10
+ 		};
+
+ 		var circle = {
+ 			x: width / 2,
+ 			y: height / 2,
+ 			radius: 0
+ 		};
+
+ 		var mappingValues = {
+ 			smin: 0,
+ 			smax: width,
+ 			dmin: 10,
+ 			dmax: 100
+ 		};
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			rect.width += 2;
+ 			circle.radius = map(rect.width, 
+ 				mappingValues.smin, 
+ 				mappingValues.smax, 
+ 				mappingValues.dmin, 
+ 				mappingValues.dmax);
+
+ 			if(rect.width >= width) {
+ 				rect.width = 0;
+ 			}
+
+ 			context.clearRect(0, 0, width, height);
+ 			
+ 			context.fillStyle = "#222";
+ 			context.fillRect(rect.x, rect.y, rect.width, rect.height);
+
+ 			context.beginPath();
+ 			context.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
+ 			context.fill();
+
+
+ 		});
+
+
+	});
+	</script>
+</body>
+</html>

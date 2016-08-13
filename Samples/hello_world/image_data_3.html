@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Image data 3</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+		#c {
+			display: block;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script src="stats.js"></script>
+	<script>
+		//request animation
+		(function() {
+			var lastTime = 0;
+			var vendors = ['ms', 'moz', 'webkit', 'o'];
+			for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+				window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+				window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame']
+										   || window[vendors[x]+'CancelRequestAnimationFrame'];
+			}
+		 
+			if (!window.requestAnimationFrame)
+				window.requestAnimationFrame = function(callback, element) {
+					var currTime = new Date().getTime();
+					var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+					var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+					  timeToCall);
+					lastTime = currTime + timeToCall;
+					return id;
+				};
+		 
+			if (!window.cancelAnimationFrame)
+				window.cancelAnimationFrame = function(id) {
+					clearTimeout(id);
+				};
+		}());	
+		
+		function clearCanvas() {
+			ctx.fillStyle = "rgba(0, 0, 0, 1)";
+			ctx.fillRect(0, 0, w, h);
+		}
+	
+		function getImageData() {
+			return ctx.getImageData(0, 0, w, h).data;
+		}
+		
+		function initMovers(imageData) {
+			var tw = 5,
+				th = 5;
+								
+			var pos = null,
+				mover = null;
+				
+			for(var y = 0; y < h; y += th) {
+				for(var x = 0; x < w; x += tw) {
+					
+					pos = x * 4 + y * w * 4;
+					if(imageData[pos + 3] > 0) {
+						mover = new Mover();
+						mover.x = x - world3D.originX;
+						mover.y = y - world3D.originY;
+						mover.z = 0;
+						movers.push(mover);
+					}
+				}//end of inner loop
+			}// end of outer loop
+		}//end of initMovers
+
+		function sortZ(obj1, obj2) {
+			return obj2.z - obj1.z;
+		}
+		
+		function Mover() {
+			this.x = 0;
+			this.y = 0;
+			this.z = 0;
+			this.rad = 1;
+			this.color = "white";
+		}
+				
+		Mover.prototype = {
+			draw: function(scale, x, y) {
+				ctx.transform(scale, 0, 0, scale, x, y);
+				ctx.beginPath();
+				ctx.arc(0, 0, this.rad, 0, Math.PI * 2, false);
+				ctx.fillStyle = this.color;
+				ctx.fill();
+				ctx.closePath();
+				ctx.setTransform(1, 0, 0, 1, 0, 0);				
+			}//end of draw
+		};
+		
+		function render(objects) {
+			var obj3D = null,
+				scale = 0,
+				coordinate2D = null,
+				oldCoordinate2D = null;
+				
+			objects.sort(sortZ);
+				
+			for(var i = 0, len = objects.length; i < len; i++) {
+				
+				obj3D = objects[i];
+				coordinate2D = convertTo2D(obj3D.x, obj3D.y, obj3D.z);
+				
+				if(obj3D.z > -world3D.fov) {
+					obj3D.draw(coordinate2D.scale, coordinate2D.x, coordinate2D.y);
+				}
+			}//end of loop
+		}//end of render
+		
+		function convertTo2D(x, y, z) {
+		
+			var scale = world3D.fov / (z + world3D.fov),
+				x2D = world3D.originX + x * scale,
+				y2D = world3D.originY + y * scale;
+				
+			return {x: x2D, y: y2D, scale: scale};
+		}
+		
+		function update(objects) {
+			var obj3D = null,
+				cos = null,
+				sin = null,
+				x = null,
+				y = null,
+				angleX = 0,
+				angleY = 0;
+
+			angleX = (mouseX - world3D.originX) * 0.0001;
+			angleY = (mouseY - world3D.originY) * 0.0001;
+				
+			for(var i = 0, len = objects.length; i < len; i++) {
+				obj3D = objects[i];
+				
+				cos = Math.cos(angleX);
+				sin = Math.sin(angleX);
+				x = obj3D.x * cos - obj3D.z * sin;
+				z = obj3D.z * cos + obj3D.x * sin;
+				obj3D.x = x;
+				obj3D.z = z;
+				
+				
+				cos = Math.cos(angleY);
+				sin = Math.sin(angleY);				
+				y = obj3D.y * cos - obj3D.z * sin;
+				z = obj3D.z * cos + obj3D.y * sin;				
+				obj3D.y = y;
+				obj3D.z = z;
+			}
+		}
+		
+		function onMouseMoveHandler(e) {
+			mouseX = e.clientX;
+			mouseY = e.clientY;
+		}
+		
+		function animate() {
+			stats.begin();
+			requestAnimationFrame(animate);
+			clearCanvas();
+			update(movers);
+			render(movers);
+			stats.end();
+		
+		}				
+//------------------------------------------------------------------------------------------------------------------------------------------			
+		var movers = [];
+
+		//canvas initialization
+		var w = window.innerWidth,
+			h = window.innerHeight,
+			c = document.getElementById("c");
+		
+		c.width = w;
+		c.height = h;
+
+		var world3D = {
+			originX: w / 2,
+			originY: h / 2,
+			fov: 250
+		};		
+		
+		//context initialization
+		var ctx = c.getContext("2d"),
+			mouseX = world3D.originX,
+			mouseY = world3D.originY;
+		
+		
+		//stats.js initialization
+		var stats = new Stats();
+
+		stats.domElement.style.position = "absolute";
+		stats.domElement.style.left = "0px";
+		stats.domElement.style.top = "0px";
+		document.body.appendChild(stats.domElement);
+		
+		var keyword = "Hello World";
+		ctx.fillStyle = "black";
+		ctx.font = "bold 200px helvetica";
+		ctx.textAlign = "center";
+		ctx.fillText(keyword, w/2, h/2);
+		
+		//getting image data
+		var imageData = getImageData();
+		ctx.clearRect(0, 0, w, h);
+		
+		initMovers(imageData);
+		addEventListener("mousemove", onMouseMoveHandler);
+		
+		animate();
+	</script>
+</body>
+</html>

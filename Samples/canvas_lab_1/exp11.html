@@ -1,0 +1,129 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Exp 11</title>
+	<style type="text/css">
+		body
+		{
+			margin: 0;
+			padding: 0;
+		}
+		
+		#canvas2D {
+			display: block;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas2D"></canvas>
+	<script type="text/javascript" src="requestanimframe.js"></script>
+	<script type="text/javascript">
+		var canvas2D = null;
+		var context2D = null;
+		var clearScreenColor = null;
+		var squares = [];
+
+		
+		document.body.onload = init;
+		
+	
+		function init()
+		{
+			//initialize canvas2D
+			canvas2D = document.getElementById("canvas2D");
+			canvas2D.width = window.innerWidth;
+			canvas2D.height = window.innerHeight;
+			
+			//initialize context2D
+			context2D = canvas2D.getContext("2d");
+			
+			//initialize clearScreen color
+			clearScreenColor = "rgba(0, 0, 0, 0.3)";
+			
+			var maxSquare = 800;
+			var width = 2;
+			var posInc = window.innerWidth / maxSquare;
+			var square = null;
+			var height = 300;
+			var posX = 0;
+			var angleInc = Math.PI * 2 / maxSquare;
+			var angle = 0;
+			
+			for(var i = 0; i < maxSquare; i++)
+			{
+				square = new Square(posX, 0, width, height, "#ffffff");
+				square.angle = angle;
+				square.angleInc = 0.1;
+				square.oscillationRange = 50;
+				squares.push(square);
+				posX += posInc;
+				angle += angleInc;
+			}
+			
+			
+			
+			frameLoop();
+		}
+		
+		function frameLoop()
+		{
+			
+			clearScreen();			
+			drawObjects();
+			requestAnimFrame(frameLoop);
+		}
+		
+		
+		function drawObjects()
+		{
+			var len = squares.length;
+			
+			for(var i = 0; i < len; i++)
+			{
+				squares[i].update();
+				squares[i].render();
+			}
+		}
+				
+		function Square(x, y, width, height, color)
+		{
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			this.tHeight = height;
+			this.color = color;
+			this.angle = 0;
+			this.angleInc = 0;
+			
+			this.render = function()
+			{
+				context2D.fillStyle = this.color;
+				context2D.fillRect(this.x, this.y, this.width, this.height);
+			};
+			
+			
+			this.update = function()
+			{
+				this.height = this.tHeight + Math.sin(this.angle) * this.oscillationRange;
+				this.angle += this.angleInc;
+			};
+		}
+		
+		
+		function clearScreen()
+		{	
+			context2D.fillStyle = clearScreenColor;
+			context2D.fillRect(0, 0, window.innerWidth, window.innerHeight);
+		}
+		
+		
+		function randRange(min, max)
+		{
+			return Math.random() * (max - min) + min;
+		}
+		
+	</script>
+</body>
+</html>

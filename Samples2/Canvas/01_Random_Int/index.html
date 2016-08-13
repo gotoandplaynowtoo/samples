@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Random Int</title>
+	<style>
+	* {
+		margin: 0;
+		padding: 0;
+	}
+
+	html, body {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	body {
+		background: #eee;
+	}
+
+	canvas {
+		display: block;
+		background: white;
+	}
+
+	.canvas-container {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		box-shadow: 0 2px 2px rgba(0, 0, 0, 0.5);
+	}
+	</style>
+</head>
+<body>
+	<div class="canvas-container">
+		<canvas id="c"></canvas>		
+	</div>
+	<script>
+	;(function(main) {
+		main(window, document);
+	})(function(window, document) {
+
+		var UTIL = {
+			randomInt: function(min, max) {
+				return Math.floor(min + Math.random() * (max - min + 1));
+			}
+		};
+/**
+ * ===========================================================
+ */
+ 		function Box(x, y, width, height, color) {
+ 			this.x = x;
+ 			this.y = y; 
+ 			this.width = width;
+ 			this.height = height;
+ 			this.color = color;
+ 		}
+
+ 		Box.prototype = {
+ 			constructor: Box,
+ 			update: function() {},
+ 			render: function(context) {
+ 				context.save();
+ 				context.translate(this.x, this.y);
+ 				context.fillStyle = this.color;
+ 				context.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+ 				context.restore();
+ 			}
+ 		};
+ /**
+ * ===========================================================
+ */
+
+ 		var canvas = document.getElementById("c"),
+ 			context = c.getContext("2d"),
+ 			width = c.width = 960,
+ 			height = c.height = 600;
+
+ 		var boxes = [],
+ 			box = null,
+ 			objectCount = 50,
+ 			xposSlice = width / objectCount;
+
+ 		for(var i = 0; i < objectCount; i++) {
+ 			box = new Box((i + 0.5) * xposSlice, height / 2, 10, 10, "#222");
+ 			boxes.push(box);
+ 		}
+
+		requestAnimationFrame(function frame() {
+
+			requestAnimationFrame(frame);
+			context.clearRect(0, 0, width, height);
+
+			boxes[UTIL.randomInt(0, objectCount-1)].height++;
+
+			for(var i = 0; i < objectCount; i++) {
+				boxes[i].update();
+				boxes[i].render(context);
+			}
+
+		});	
+
+	});
+	</script>
+</body>
+</html>

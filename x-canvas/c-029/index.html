@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-029</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script src="../utility/V2D-v0.1.js"></script>
+	<script>
+
+	"use strict";
+
+	(function(init) {
+
+		init(window, document);
+
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight,
+			mouse = {
+				x: w / 2,
+				y: h / 2
+			};
+
+/**
+ * ============================================
+ */
+
+ 		function Particle(position, velocity, radius, color, delay) {
+ 			this.position = position;
+ 			this.velocity = velocity;
+ 			this.radius = radius;
+ 			this.color = color;
+ 			this.gravity = V2D.create(0, 0.5);
+ 			this.delay = delay;
+ 			this.delayCtr = 0;
+ 			this.prevPosition = V2D.create(this.position.x, this.position.y);
+ 		}
+
+ 		Particle.prototype = {
+ 			constructor: Particle, 
+ 			reset: function() {
+ 				this.position.x = mouse.x;
+ 				this.position.y = mouse.y;
+ 				this.velocity.x = Math.random() * 10 - 5;
+ 				this.velocity.y = Math.random() * -10;
+ 				this.radius = Math.random() * 10;
+ 			},
+ 			update: function() {
+
+ 				if(this.delayCtr < this.delay) {
+ 					this.delayCtr++;
+ 					return;
+ 				}
+
+ 				this.prevPosition.x = this.position.x;
+ 				this.prevPosition.y = this.position.y;
+ 				this.velocity.add(this.gravity);
+ 				this.position.add(this.velocity);
+ 				this.color += 0.5;
+
+ 				if(this.position.y > h - 100) {
+ 					this.position.y = h - 100;
+ 					this.velocity.y *= -0.6;
+ 				}
+
+ 				if(this.position.x < 0 || this.position.x > w) {
+ 					this.reset();
+ 				}
+ 			},
+ 			render: function(ctx) {
+
+ 				if(this.delayCtr < this.delay) {
+ 					return;
+ 				} 				
+
+ 				ctx.save();
+ 				ctx.translate(this.position.x, this.position.y);
+ 				ctx.fillStyle = "hsla(" + this.color + ", 100%, 50%, 0.5)";
+ 				ctx.beginPath();
+ 				ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+ 				ctx.fill();
+ 				ctx.beginPath();
+ 				ctx.fillStyle = "white";
+ 				ctx.arc(0, 0, this.radius / 2, 0, Math.PI * 2);
+ 				ctx.fill();
+ 				ctx.restore();
+
+				ctx.strokeStyle = "hsla(" + this.color + ", 100%, 50%, 0.5)";
+ 				ctx.beginPath();
+ 				ctx.moveTo(this.prevPosition.x, this.prevPosition.y);
+ 				ctx.lineTo(this.position.x, this.position.y);
+ 				ctx.stroke();
+
+ 			}
+ 		};
+
+/**
+ * ============================================
+ */ 
+
+ 		document.body.addEventListener("mousemove", function(e) {
+ 			mouse.x = e.clientX;
+ 			mouse.y = e.clientY;
+ 		})
+
+ 		var particle = null,
+ 			particles = [],
+ 			objectCount = 200,
+ 			color = Math.random() * 360;
+
+ 		for(var i = 0; i < objectCount; i++) {
+ 			particle = new Particle(
+ 					V2D.create(mouse.x, mouse.y),
+ 					V2D.create(Math.random() * 10 - 5, Math.random() * -10),
+ 					Math.random() * 10, 
+ 					color,
+ 					i
+ 				);
+
+ 			particles.push(particle);
+ 		}
+
+ 		requestAnimationFrame(function frame() {
+
+			requestAnimationFrame(frame);
+
+			ctx.globalCompositeOperation = "source-over";
+			ctx.fillStyle = "black";
+			ctx.fillRect(0, 0, w, h);
+
+			ctx.globalCompositeOperation = "lighter";
+
+			for(var i = 0; i < objectCount; i++) {
+				particle = particles[i];
+				particle.update();
+				particle.render(ctx);
+			}
+
+ 		});
+
+
+	});
+	</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-020</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+
+	"use strict";
+
+	(function(init) {
+
+		init(window, window.document);
+
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+
+/**
+ *================================================
+ */
+
+ 		function normalize(value, min, max) {
+ 			return (value - min) / (max - min);
+ 		}//EN OF NORMALIZE FUNCTION
+
+ 		function draw(ctx, dataHolder, color, size) {
+
+ 			ctx.strokeStyle = color;
+ 			ctx.fillStyle = color;
+ 			ctx.lineWidth = size;
+			ctx.beginPath();
+
+	 		for(var i = 0, len = dataHolder.data.length; i < len; i++) {
+	 			var x = w / (len - 1)  * i,
+	 				y = h - h * normalize(dataHolder.data[i], dataHolder.min, dataHolder.max);
+
+	 			if(i == 0) {
+	 				ctx.moveTo(x, y);
+	 			}
+	 			else {
+	 				ctx.lineTo(x, y);
+	 			}
+
+	 		}
+
+			ctx.closePath();
+	 		ctx.stroke(); 
+	 		ctx.fill();
+
+ 		}//END OF DRAW FUNCTION
+
+
+ 		function getRandomData(len, min, max) {
+
+ 			var data = [], 
+ 				value = null;
+
+ 			for(var i = 0; i < len; i++) {
+ 				value = Math.random() * (max - min) + min;
+ 				data.push(value);
+ 			}
+
+ 			return {
+ 				data: data, 
+ 				min: Math.min.apply(null, data),
+ 				max: Math.max.apply(null, data)
+ 			};
+ 		}//END OF GET RANDOM DATA
+
+
+/**
+ *================================================
+ */			 
+ 		draw(ctx, getRandomData(Math.floor(Math.random() * 1000), Math.random() * 500, Math.random() * 500), "hsla(" + (Math.random() * 360) + ", 100%, 50%, " + (Math.random()), Math.random());
+ 		draw(ctx, getRandomData(Math.floor(Math.random() * 1000), Math.random() * 500, Math.random() * 500), "hsla(" + (Math.random() * 360) + ", 100%, 50%, " + (Math.random()), Math.random());
+		draw(ctx, getRandomData(Math.floor(Math.random() * 1000), Math.random() * 500, Math.random() * 500), "hsla(" + (Math.random() * 360) + ", 100%, 50%, " + (Math.random()), Math.random()); 			
+		draw(ctx, getRandomData(Math.floor(Math.random() * 1000), Math.random() * 500, Math.random() * 500), "hsla(" + (Math.random() * 360) + ", 100%, 50%, " + (Math.random()), Math.random());			
+
+	});
+
+	</script>
+</body>
+</html>

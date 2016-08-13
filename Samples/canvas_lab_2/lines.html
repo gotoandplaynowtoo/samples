@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Lines</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+	
+		canvas {
+			display: block;
+			background: black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas-dom">Your browser does not support canvas element.</canvas>
+	<script src="stats.js"></script>
+	<script src="raf.js"></script>
+	<script src="x.js"></script>
+	<script>
+		(function() {
+
+/*--------------------------------------------------------CLASSES-----------------------------------------------------------------*/
+			function Origin(x, y) {
+				this.x = x;
+				this.y = y;
+			}
+
+			function Line(settings) {
+
+				this.position		= settings.position;
+				this.speed 			= settings.speed;
+				this.color 			= settings.color;
+				this.origin 		= settings.origin;
+				this.angle			= settings.angle;
+				this.upDownRadius	= settings.upDownRadius;
+				this.dimension		= settings.dimension;
+
+			}
+
+			Line.prototype = {
+				update: function() {
+
+					this.position.oldX = this.position.x;
+					this.position.oldY = this.position.y;
+
+					this.position.x += this.speed.x;
+					this.angle.value += this.angle.speed;
+					this.position.y = this.origin.y + Math.sin(this.angle.value) * this.upDownRadius;
+					
+					if(this.position.x > this.dimension.width) {
+
+						this.position.x = 0;
+						this.position.y = this.dimension.height / 2
+						this.position.oldX = this.position.x;
+						this.position.oldY = this.position.y;
+						this.angle.value = 0;
+
+						this.speed.x = 20 * Math.random() + 10;
+						this.angle.speed = Math.random() * 0.2 - 0.1;
+						this.upDownRadius = 200 * Math.random();
+
+					}
+				},
+				render: function(context) {
+
+					context.beginPath();
+					context.lineWidth = Math.random() * 10;
+					context.strokeStyle = this.color;
+					context.moveTo(this.position.oldX, this.position.oldY);
+					context.lineTo(this.position.x, this.position.y);
+					context.stroke();
+					context.closePath();
+
+				}
+			};
+
+/*--------------------------------------------------------HELPERS-----------------------------------------------------------------*/
+			function createDisplayObjects(classReference, len) {
+				
+				var displayObjects 	= [],
+					line 			= null,
+					settings		= null,
+					origin 			= new classReference.Origin(classReference.Dimension.width / 2, classReference.Dimension.height / 2),
+					colors			= ["#33B5E5", "#AA66CC", "#99CC00", 
+									   "#FFBB33", "#FF4444", "#0099CC", 
+									   "#9933CC", "#669900", "#FF8800", 
+									   "#CC0000"],
+					color 			= colors[Math.floor(Math.random() * colors.length)];
+
+				for(var i = 0; i < len; i++) {
+					
+					settings = {
+						position: {
+							x: 0,
+							y: origin.y
+						},
+						color: color,
+						speed: {
+							x: 20 * Math.random() + 10,
+							y: 0
+						},
+						origin: origin,
+						angle: {
+							value: 0,
+							speed: Math.random() * 0.2 - 0.1
+						},
+						upDownRadius: 200 * Math.random(),
+						dimension: classReference.Dimension
+					};
+
+					line = new classReference.Line(settings);
+					displayObjects.push(line);
+
+				}
+
+				return displayObjects;
+
+			}
+
+
+/*--------------------------------------------------------MAIN-----------------------------------------------------------------*/
+			X.Dimension.init({width: window.innerWidth, height: window.innerHeight});
+			
+			X.Stage.init({
+
+				domElement: 			document.getElementById("canvas-dom"),
+				stats: 					new Stats(),
+				clearColor: 			"rgba(0, 0, 0, 0.1)",
+				displayObjects: 		createDisplayObjects({
+																Origin: 		Origin,
+																Line: 			Line,
+																Dimension: 		X.Dimension 
+															 }, 50)
+
+			});
+
+			
+			X.Stage.animate();
+
+		})();
+	</script>
+</body>
+</html>

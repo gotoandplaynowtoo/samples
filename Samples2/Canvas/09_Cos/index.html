@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Cos</title>
+	<style>
+	
+	* {
+		padding: 0;
+		margin: 0;
+	}
+
+	html, body {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	body {
+		background: #eee;
+	}
+
+	canvas {
+		display: block;
+		background: white;
+	}
+
+	.canvas-container {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+
+	</style>
+</head>
+<body>
+	<div class="canvas-container">
+		<canvas id="c"></canvas>
+	</div>
+	<script>
+	"use strict";
+	;(function(main) {
+		main(window, document);
+	})(function(window, document) {
+
+		var canvas = document.getElementById("c"),
+			context = canvas.getContext("2d"),
+			width = canvas.width = 960,
+			height = canvas.height = 600;
+/**
+ * ======================================
+ */		
+ 		var cx = width / 2,
+ 			cy = height / 2;
+
+ 		var circle = {
+ 			x: cx,
+ 			y: cy,
+ 			radius: 20,
+ 			baseRadius: 20,
+ 			angle: 0,
+ 			color: "#222"
+ 		};
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			circle.x = cx + Math.cos(circle.angle) * 200;
+ 			circle.radius = circle.baseRadius + Math.cos(circle.angle) * circle.baseRadius / 2;
+ 			circle.angle += 0.1;
+
+ 			context.clearRect(0, 0, width, height);
+
+ 			context.save();
+ 			context.fillStyle = circle.color;
+ 			context.translate(circle.x, circle.y);
+ 			context.beginPath();
+ 			context.arc(0, 0, circle.radius, 0, Math.PI * 2);
+ 			context.fill();
+
+ 			context.restore();
+
+ 		});
+
+
+	});
+	</script>
+</body>
+</html>

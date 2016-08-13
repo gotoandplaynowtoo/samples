@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>FillRectangle Demo 5</title>
+	<style type="text/css">
+		body {
+			margin: 0px;
+			padding: 0px;
+			overflow: hidden;
+		}
+
+	</style>
+</head>
+<body>
+	<script type="text/javascript" src="js/stat.js"></script>
+	<script type="text/javascript" src="js/request_anim_frame.js"></script>
+	<script type="text/javascript" src="js/x.js"></script>
+	
+	<script type="text/javascript">	
+	
+		
+		/*
+			EXTENDED FillRectangle class
+==========================================================================			
+		*/
+		function XFillRectangle(style, x, y, width, height) {
+			X.FillRectangle.call(this, style, x, y, width, height);
+			this.vx = 0;
+			this.vy = 0;
+			this.vr = 0;
+			this.va = 0;
+		}
+		
+		XFillRectangle.prototype = Object.create(X.FillRectangle.prototype);
+		XFillRectangle.prototype.constructor = XFillRectangle;	
+		/*
+============================================================================
+		*/	
+		
+		
+		var stats = new Stats();
+		stats.setMode(0);
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.left = '0px';
+		stats.domElement.style.top = '0px';
+
+		document.body.appendChild(stats.domElement);
+		
+		
+		var stage = null;
+		
+		init();
+		
+		function init() {
+			stage = new X.Stage(null, window.innerWidth, window.innerHeight);
+			var rect = null;
+			var numRect = 500;
+			var angleInc = 360 / numRect;
+			var angle = 0;
+			
+			for(var i = 0; i < numRect; i++)
+			{
+				rect = new XFillRectangle(null, null, null, null, null);				
+				angle+=angleInc;
+				resetProperty(angle, rect);
+				
+				stage.add(rect);
+			}
+			
+		}
+		
+		function resetProperty(angle, rect) {			
+			angle = angle * Math.PI / 180;
+			rect.style = "hsla("+(angle * 180 / Math.PI)+", 100%, 50%, 1)";
+			rect.x = stage.width/ 2 + Math.sin(angle) * 300;
+			rect.y = stage.height / 2 + Math.cos(angle) * 300;
+			rect.width =  50;
+			rect.height = 50;
+			rect.rotation = angle;
+			rect.alpha = 0.1;
+		}
+	
+	
+		(function enterFrame() {
+			requestAnimFrame(enterFrame);
+			
+			stats.begin();
+			render();
+			stats.end();
+			
+		})();
+		
+		
+		function render(){
+			var len = len = stage.displayList.length;
+			
+			stage.clearFill("rgba(0, 0, 0, 0.1)");
+			
+			
+			while(--len >= 0)
+			{
+				stage.displayList[len].rotation += 0.02;	
+				stage.displayList[len].draw();			
+			}
+
+		}
+		
+
+
+		
+	</script>	
+</body>
+</html>

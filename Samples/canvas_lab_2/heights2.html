@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Heights 2</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+	
+		canvas {
+			display: block;
+			background: black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas-dom">Your browser does not support canvas element.</canvas>
+	<script src="stats.js"></script>
+	<script src="raf.js"></script>
+	<script src="x.js"></script>
+	<script>
+		(function() {
+
+/*--------------------------------------------------------CLASSES-----------------------------------------------------------------*/
+			function Origin(x, y) {
+				this.x = x;
+				this.y = y;
+			}
+
+			function Orbit(radius) {
+				this.radius = radius;
+			}
+
+			function Angle(value, speed) {
+
+				this.value = value;
+				this.speed = speed;
+
+			}
+
+			Angle.prototype = {
+				update: function() {
+					this.value += this.speed;
+				}
+			};
+
+			function Rectangle(settings) {
+
+				this.position	= settings.position;
+				this.width 		= settings.width;
+				this.height 	= settings.height;
+				this.color 		= settings.color;
+				this.angle 		= settings.angle;
+				this.rotation 	= settings.rotation;
+				this.origin 	= settings.origin;
+				this.orbit 		= settings.orbit;				
+
+			}
+
+			Rectangle.prototype = {
+				update: function() {
+
+					this.position.x = this.origin.x + Math.cos(this.angle.value) * this.orbit.radius;
+					this.position.y = this.origin.y + Math.sin(this.angle.value) * this.orbit.radius;
+					this.angle.update();
+					this.rotation = this.angle.value;
+
+				},
+				render: function(context) {
+
+					context.save();
+					context.fillStyle = this.color;
+					context.translate(this.position.x, this.position.y);
+					context.rotate(this.rotation);
+					context.fillRect(0 - this.width/2, -this.height, this.width, this.height);
+					context.restore();
+
+				}
+			};
+
+/*--------------------------------------------------------HELPERS-----------------------------------------------------------------*/
+			function createDisplayObjects(classReference, len) {
+				
+				var displayObjects 	= [],
+					rectangle 		= null,
+					settings		= null,
+					origin 			= new classReference.Origin(classReference.Dimension.width / 2, classReference.Dimension.height / 2),
+					orbit 			= new classReference.Orbit(200),
+					height 			= 0,
+					baseHeight 		= 200,
+					minHeight		= 10,
+					angleValue		= 0,
+					angleIncrement 	= classReference.Converter.toRadian(360 / len),
+					colors			= ["#33B5E5", "#AA66CC", "#99CC00", "#FFBB33", "#FF4444", "#0099CC", "#9933CC", "#669900", "#FF8800", "#CC0000"],
+					color			= colors[Math.floor(Math.random() * colors.length)],
+					xpos			= 0,
+					ypos			= 0,
+					heightAngle		= 0;					
+
+				for(var i = 0; i < len; i++) {
+					
+
+					height = minHeight + baseHeight + Math.sin(heightAngle) * baseHeight;
+					
+					xpos = origin.x + Math.cos(angleValue) * orbit.radius;
+					ypos = origin.y + Math.sin(angleValue) * orbit.radius;			
+														
+					settings = {
+						position: 	{
+							x: xpos,
+							y: ypos
+						},
+						width: 		10,
+						height: 	height,
+						color: 		color,
+						angle: 		new classReference.Angle(angleValue, 0.03),
+						rotation: 	angleValue,
+						origin: 	origin,
+						orbit: 		orbit
+					};
+
+				
+					rectangle = new classReference.Rectangle(settings);
+					displayObjects.push(rectangle);
+
+					angleValue += angleIncrement;
+					heightAngle += 10;					
+
+				}
+
+				return displayObjects;
+
+			}
+
+
+/*--------------------------------------------------------MAIN-----------------------------------------------------------------*/
+			X.Dimension.init({width: window.innerWidth, height: window.innerHeight});
+			
+			X.Stage.init({
+
+				domElement: 			document.getElementById("canvas-dom"),
+				stats: 					new Stats(),
+				clearColor: 			"rgba(0, 0, 0, 0.05)",
+				displayObjects: 		createDisplayObjects({
+																Origin: 		Origin,
+																Orbit: 			Orbit,
+																Angle: 			Angle,
+																Rectangle: 		Rectangle,
+																Dimension: 		X.Dimension, 
+																Converter: 		X.Converter														
+															 }, 50)
+
+			});
+
+			
+			X.Stage.animate();
+
+		})();
+	</script>
+</body>
+</html>

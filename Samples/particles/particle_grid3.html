@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Particle Grid 3</title>
+	<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+	<div id="images" style="display:none">
+		<img src="img/particle3.png" id="particleImg"/>
+	</div>
+	
+	<script src="js/request_animation_frame.js"></script>
+	<script src="js/stats.min.js"></script>
+	<script src="js/x.js"></script>
+	<script>
+		var scene = null, 
+			stats = null;
+		
+		window.onload = init;
+		
+		function init() 
+		{
+			stats = new Stats();
+			stats.domElement.style.position = "absolute";
+			stats.domElement.style.left = "10px";
+			stats.domElement.style.top = "10px";
+			document.body.appendChild(stats.domElement);
+			
+			scene = new X.Scene();
+			scene.setRenderer(new X.CanvasRenderer());
+			scene.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(scene.getCanvas());
+						
+			createGrid();
+			scene.render();
+			animate();
+		}
+		
+		function createGrid() 
+		{
+		
+			var numRow = 20, 
+				numCol = 42, 
+				colSpacing = 5,
+				rowSpacing = 5;
+				
+			var particle = null;
+			var pImage = document.getElementById("particleImg");
+			
+			var width = pImage.width;
+			var height = pImage.height;
+			
+			var colTotalSpacing = colSpacing * (numCol - 1);
+			var totalWidth = width * (numCol - 1) + colTotalSpacing;
+			var x = (scene.width - totalWidth) / 2;
+			
+			var rowTotalSpacing = rowSpacing * (numRow - 1);
+			var totalHeight = height * (numRow - 1) + rowTotalSpacing;
+			var y = (scene.height - totalHeight) / 2;
+
+			for(var row = 0; row < numRow; row++)
+			{
+				for(var col = 0; col < numCol; col++)
+				{
+					particle = new X.Particle(pImage, x, y);
+					scene.add(particle);
+					
+					particle.scaleX = particle.scaleY = particle.rotation = Math.cos(col * 0.09);
+					 
+					x += width + colSpacing;
+					
+				}
+				
+				x = (scene.width - totalWidth) / 2;
+				y += height + rowSpacing;
+			}
+			
+		}
+		
+				
+		function animate() 
+		{
+			requestAnimationFrame(animate);
+			stats.begin();
+			renderScene();
+			stats.end();
+		}
+		
+		function renderScene() 
+		{
+			scene.clearFill("rgba(0, 0 , 0, 0.5)");
+			scene.setCompositeOperation("lighter");
+			
+			for(var i = 0, len = scene.displayObjects.length; i < len; i++)
+			{									
+				scene.displayObjects[i].scaleX = scene.displayObjects[i].scaleY = Math.cos(scene.displayObjects[i].rotation += 0.07);
+				scene.displayObjects[i].draw();	
+			}
+			
+			
+			scene.render();
+		}
+	</script>
+	
+</body>
+</html>

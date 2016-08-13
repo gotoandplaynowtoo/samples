@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Random Range</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+
+	html, body {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	body {
+		background: #eee;
+	}
+
+	canvas {
+		display: block;
+		background: white;
+	}
+
+	.canvas-container {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+	</style>
+</head>
+<body>
+	<div class="canvas-container">
+		<canvas id="c"></canvas>
+	</div>
+	<script>
+	"use strict";
+	;(function(main) {
+		main(window, document);
+	})(function(window, document) {
+
+		var canvas = document.getElementById("c"),
+			context = canvas.getContext("2d"),
+			width = canvas.width = 960,
+			height = canvas.height = 600;
+/**
+ * ===============================================
+ */
+ 		function randomRange(min, max) {
+ 			return min + Math.random() * (max - min);
+ 		}
+/**
+ * ===============================================
+ */ 
+ 		var angle = 0;
+
+ 		requestAnimationFrame(function frame() {
+ 			requestAnimationFrame(frame);
+
+ 			context.fillStyle = "rgba(255, 255, 255, 0.1)";
+ 			context.fillRect(0, 0, width, height);
+
+ 			var cx = width / 2,
+ 				cy = height / 2;
+
+ 			var x = cx + Math.cos(angle) * randomRange(50, 200),
+ 				y = cy + Math.sin(angle) * randomRange(50, 200);
+
+ 			context.fillStyle = "#222";
+ 			context.beginPath();
+ 			context.arc(x, y, randomRange(2, 10), 0, Math.PI * 2);
+ 			context.fill();
+
+ 			angle += 0.1;
+
+ 		});
+
+	});
+	</script>
+</body>
+</html>

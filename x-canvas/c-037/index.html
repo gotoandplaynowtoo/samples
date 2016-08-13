@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-037</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script src="../utility/V2D-v0.1.js"></script>
+	<script>
+
+	"use strict";
+
+	(function(init) {
+		init(window, document);
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+
+/**
+ * ===================================================
+ */		
+ 		function Particle(position, velocity, radius) {
+
+ 			this.position = position;
+ 			this.velocity = velocity;
+ 			this.radius = radius;
+
+ 			this.friction = V2D.create(0, 0);
+ 			this.friction.setLength(0.15);
+ 			this.friction.setAngle(this.velocity.getAngle());
+ 			this.baseRadius = this.radius;
+ 			this.angle = Math.random() * (Math.PI * 2);
+ 			this.angleSpeed = Math.random() * 0.1;
+ 		}
+
+ 		Particle.prototype = {
+ 			constructor: Particle,
+ 			update: function() {
+ 				
+ 				if(this.velocity.getLength() > this.friction.getLength()) {
+					this.velocity.sub(this.friction); 					
+ 				}
+ 				else {
+ 					this.velocity.setLength(0);
+ 				}
+
+ 				this.radius = this.baseRadius + Math.cos(this.angle) * (this.baseRadius / 2);
+ 				this.angle += this.angleSpeed;
+ 				this.position.add(this.velocity);
+ 			},
+ 			render: function(ctx) {
+ 				ctx.save();
+ 				ctx.translate(this.position.x, this.position.y);
+ 				ctx.beginPath();
+ 				ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+ 				ctx.fill();
+ 				ctx.restore();
+ 			}
+ 		};
+/**
+ * ===================================================
+ */		
+ 		var particle = null,
+ 			particles = [],
+ 			objectCount = 50;
+
+ 		for(var i = 0; i < objectCount; i++) {
+ 			particle = new Particle(
+ 				V2D.create(w / 2, h / 2),
+ 				V2D.create(Math.random() * 20 - 10, Math.random() * 20 - 10),
+ 				2 + Math.random() * 20
+ 			);
+ 			particles.push(particle);
+ 		}
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.clearRect(0, 0, w, h);
+
+ 			for(var i = 0; i < objectCount; i++) {
+ 				particle = particles[i];
+	 			particle.update();
+	 			particle.render(ctx); 				
+ 			}
+
+ 		});
+
+
+	});
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Distance</title>
+	<style>
+
+	* {
+		padding: 0;
+		margin: 0;
+	}
+
+	html, body {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	body {
+		background: #eee;
+	}
+
+	canvas {
+		display: block;
+		background: white;
+	}
+
+	.canvas-container {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+
+	</style>
+</head>
+<body>
+	<div class="canvas-container">
+		<canvas id="c"></canvas>
+	</div>
+	<script>
+	"use strict";
+	;(function(main) {
+		main(window, document);
+	})(function(window, document) {
+
+		var canvas = document.getElementById("c"),
+			context = canvas.getContext("2d"),
+			width = canvas.width = 960,
+			height = canvas.height = 600;
+
+		var boundRect = canvas.getBoundingClientRect();
+
+		var mouse = {
+			x: width / 2,
+			y: height / 2
+		};	
+
+ 		var circle = {
+ 			x: width / 2,
+ 			y: height / 2,
+ 			radius: 50,
+ 			color: "#222"
+ 		};
+
+ 		var circle2 = {
+ 			x: mouse.x,
+ 			y: mouse.y,
+ 			radius: 10,
+ 			color: "#222"
+ 		}; 
+
+ 		document.body.addEventListener("mousemove", function(e) {
+ 			mouse.x = e.clientX - boundRect.left;
+ 			mouse.y = e.clientY - boundRect.top;
+ 		});	
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			var dx = circle2.x - circle.x,
+ 				dy = circle2.y - circle.y,
+ 				dist = Math.sqrt(dx * dx + dy * dy);
+
+ 			circle2.x = mouse.x;
+ 			circle2.y = mouse.y;
+
+ 			context.clearRect(0, 0, width, height);
+
+			context.fillStyle = circle.color;
+ 			context.beginPath();
+ 			context.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
+ 			context.arc(circle2.x, circle2.y, circle2.radius, 0, Math.PI * 2);
+ 			context.fill();
+
+ 			context.strokeStyle = "black";
+ 			context.beginPath();
+ 			context.moveTo(circle.x, circle.y);
+ 			context.lineTo(circle2.x, circle2.y); 			
+ 			context.stroke();
+
+ 			context.fillStyle = "black";
+ 			context.font = "12px Courier New";
+ 			context.fillText("mouse { x: " + mouse.x + ", y: " + mouse.y + " }", 10, 20);
+ 			context.fillText("distance: " + dist, 10, 40);
+
+ 		});
+
+	});
+	</script>	
+</body>
+</html>

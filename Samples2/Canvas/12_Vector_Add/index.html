@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vector Add</title>
+	<style>
+
+	* {
+		padding: 0;
+		margin: 0;
+	}
+
+	html, body {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	body {
+		background: #eee;
+	}
+
+	canvas {
+		display: block;
+		background: white;
+	}
+
+	.canvas-container {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+
+	</style>
+</head>
+<body>
+	<div class="canvas-container">
+		<canvas id="c"></canvas>
+	</div>
+	<script>
+	"use strict";
+	;(function(main) {
+		main(window, document);
+	})(function(window, document) {
+
+		var canvas = document.getElementById("c"),
+			context = canvas.getContext("2d"),
+			width = canvas.width = 960,
+			height = canvas.height = 600;
+
+/**
+ * ==================================================
+ */ 
+ 		
+ 		function Vector2(x, y) {
+ 			this.x = x;
+ 			this.y = y;
+ 		}
+
+ 		Vector2.prototype = {
+ 			constructor: Vector2,
+ 			add: function(vector) {
+ 				this.x += vector.x;
+ 				this.y += vector.y;
+ 			}
+ 		}
+
+ 		function Circle(position, velocity, radius, color) {
+ 			this.position = position;
+ 			this.velocity = velocity;
+ 			this.radius = radius;
+ 			this.color = color;
+ 		}
+
+ 		Circle.prototype = {
+ 			constructor: Circle,
+ 			update: function() {
+ 				this.position.add(this.velocity);
+ 				if(this.position.x > width || this.position.x < 0 
+ 					|| this.position.y < 0 || this.position.y > height)  {
+
+ 					this.position.x = width / 2;
+ 					this.position.y = height / 2;
+
+ 					this.velocity = new Vector2(Math.random() * 20 - 10, Math.random() * 20 - 10);
+
+ 				}
+ 			},
+ 			render: function(ctx) {
+ 				ctx.save();
+ 				ctx.translate(this.position.x, this.position.y);
+ 				ctx.beginPath();
+ 				ctx.fillStyle = this.color;
+ 				ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+ 				ctx.fill();
+ 				ctx.restore();
+ 			}
+ 		}
+/**
+ * ==================================================
+ */  
+ 		var circle = new Circle(
+ 				new Vector2(width / 2, height / 2),
+ 				new Vector2(Math.random() * 20 - 10, Math.random() * 20 - 10),
+ 				5 + Math.random() * 20,
+ 				"#222"
+ 			);
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			context.clearRect(0, 0, width, height);
+
+ 			circle.update();
+ 			circle.render(context);
+
+
+ 		});
+
+	});
+	</script>
+</body>
+</html>

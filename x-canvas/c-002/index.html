@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-002</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+	(function(window, document, undefined) {
+
+		"use strict";
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight,
+			mouse = {
+				x: w / 2, 
+				y: h / 2
+			},
+			bRect = c.getBoundingClientRect();
+/**
+ * ======================================================
+ */	
+ 		function Circle(x, y, r, c) {
+ 			this.x = x;
+ 			this.y = y;
+ 			this.r = r;
+ 			this.c = c;
+ 			this.basedRadius = this.r;
+ 			this.angle = Math.random() * 360;
+ 			this.angleSpeed = 5 + Math.random() * 10;
+ 			this.radiusRange = Math.random() * 20;
+ 			this.target = {
+ 				x: Math.random() * w,
+ 				y: Math.random() * h
+ 			};
+ 			this.ex = Math.random() * 0.1;
+ 			this.ey = Math.random() * 0.1;
+ 			this.px = this.x;
+ 			this.py = this.y;
+ 			this.minDist = Math.random();
+ 		}//END OF CIRCLE CONSTRUCTOR
+
+ 		Circle.prototype = {
+ 			constructor: Circle, 
+ 			update: function() {
+
+ 				var dx = this.target.x - this.x,
+ 					dy = this.target.y - this.y,
+ 					dist = Math.sqrt(dx * dx + dy * dy);
+
+ 				this.px = this.x;
+ 				this.py = this.y;
+
+ 				this.x += dx * this.ex;
+ 				this.y += dy * this.ey;
+
+ 				if(dist < this.minDist) {
+ 					this.target.x = Math.random() * w;
+ 					this.target.y = Math.random() * h;
+ 					this.ex = Math.random() * 0.1;
+ 					this.ey = Math.random() * 0.1;
+ 					this.minDist = Math.random();
+ 				}
+
+ 				this.r = this.basedRadius + Math.cos(this.angle * Math.PI / 180) * this.radiusRange;
+ 				this.angle += this.angleSpeed;
+ 			},//END OF UPDATE FUNCTION
+ 			render: function(ctx) {
+
+ 				ctx.save();
+ 				ctx.translate(this.x, this.y);
+
+ 				ctx.fillStyle = this.c;
+ 				ctx.beginPath();
+ 				ctx.arc(0, 0, Math.abs(this.r), 0, Math.PI * 2);
+ 				ctx.fill();
+
+ 				ctx.restore();
+
+ 				ctx.lineWidth = this.r * 0.1;
+ 				ctx.strokeStyle = this.c;
+ 				ctx.beginPath();
+ 				ctx.moveTo(this.x, this.y);
+ 				ctx.lineTo(this.px, this.py);
+ 				ctx.stroke();
+
+ 				var dx = mouse.x - this.x,
+ 					dy = mouse.y - this.y,
+ 					dist = Math.sqrt(dx * dx + dy * dy);
+
+ 				if(dist < 300) {
+ 					ctx.beginPath();
+ 					ctx.moveTo(this.x, this.y);
+ 					ctx.lineTo(mouse.x, mouse.y);
+ 					ctx.stroke();
+ 				}
+
+ 			}//END OF RENDER FUNCTION
+ 		};//END OF CIRCLE PROTOTYPE
+
+/**
+ * ======================================================
+ */	
+ 		var circles = [],
+ 			circleCount = 100,
+ 			circle = null;
+
+ 		for(var i = 0; i < circleCount; i++) {
+
+ 			circle = new Circle(
+ 					w * Math.random(),
+ 					h * Math.random(),
+ 					20 * Math.random(),
+ 					"hsl(" + (360 * Math.random()) + ", 100%, 50%)"
+ 				);
+
+ 			circles.push(circle);
+
+ 		}//END OF FOR LOOP
+
+ 		document.addEventListener("mousemove", function(e) {
+ 			mouse.x = e.clientX - bRect.left;
+ 			mouse.y = e.clientY - bRect.top;
+ 		});
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.globalCompositeOperation = "source-over";
+ 			ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			ctx.globalCompositeOperation = "lighter";
+
+ 			for(var i = 0, len = circles.length; i < len; i++) {
+
+ 				circle = circles[i];
+	 			circle.update();
+	 			circle.render(ctx);
+
+ 			}//END OF FOR LOOP
+
+ 		});
+
+	})(window, window.document);
+	</script>
+</body>
+</html>

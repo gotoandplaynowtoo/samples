@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-011</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+	(function(window, document) {
+
+		"use strict";
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight,
+			mouse = {
+				x: w / 2,
+				y: h / 2
+			};
+
+/**
+ *=======================================
+ */
+ 		function Square(x, y, size, color, angle, target) {
+ 			this.x = x;
+ 			this.y = y; 
+ 			this.size = size;
+ 			this.color = color;
+ 			this.angle = angle;
+ 			this.target = target;
+ 		}
+
+ 		Square.prototype = {
+ 			constructor: Square,
+ 			update: function() {
+
+ 				this.x += (this.target.x - this.x) * 0.98;
+ 				this.y += (this.target.y - this.y) * 0.98;
+
+ 				this.angle += 0.9;
+ 				
+ 			},
+ 			render: function(ctx) {
+
+ 				ctx.fillStyle = this.color;
+
+ 				ctx.save();
+ 				ctx.translate(this.x, this.y);
+ 				ctx.rotate(this.angle * Math.PI / 180);
+ 				ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+ 				ctx.restore();
+ 			}
+ 		};
+
+/**
+ *=======================================
+ */ 
+ 		var square = null,
+ 			squares = [],
+ 			numObject = 200,
+ 			colorSlice = 360 / numObject,
+ 			color = null,
+ 			sizeAngle = 0, 
+ 			sizeAngleSlice = 0.01,
+ 			size = 0,
+ 			angle = 0,
+ 			angleSlice = 10;
+
+ 		for(var i = 0; i < numObject; i++) {
+
+ 			color = "hsla(" + (colorSlice * i) + ", 100%, 50%, 0.8)";
+ 			size = 70 + Math.sin(sizeAngle) * 40;
+ 			sizeAngle += sizeAngleSlice;
+ 			angle += angleSlice;
+
+ 			if(i === 0) {
+ 				square = new Square(w/2, h/2, size, color, angle, mouse);	
+ 			}
+ 			else {
+ 				square = new Square(w/2, h/2, size, color, angle, squares[i-1]);		
+ 			}			
+
+			squares.push(square);
+ 		}
+
+ 		document.addEventListener("mousemove", function(e) {
+ 			mouse.x = e.clientX;
+ 			mouse.y = e.clientY;
+ 		});
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.fillStyle = "rgba(0, 0, 0, 1)";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			for(var i = numObject-1; i >= 0; i--) {	
+ 				square = squares[i];
+ 				square.update();
+ 				square.render(ctx); 				
+ 			}
+
+ 		});
+
+
+	})(window, document);
+	</script>
+</body>
+</html>

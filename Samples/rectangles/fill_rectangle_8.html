@@ -1,0 +1,115 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>FillRectangle Demo 8</title>
+	<style type="text/css">
+		body {
+			margin: 0px;
+			padding: 0px;
+			overflow: hidden;
+		}
+
+	</style>
+</head>
+<body>
+	<script type="text/javascript" src="js/stat.js"></script>
+	<script type="text/javascript" src="js/request_anim_frame.js"></script>
+	<script type="text/javascript" src="js/x.js"></script>
+	
+	<script type="text/javascript">	
+	
+		
+		/*
+			EXTENDED FillRectangle class
+==========================================================================			
+		*/
+		function XFillRectangle(style, x, y, width, height) {
+			X.FillRectangle.call(this, style, x, y, width, height);
+			this.vx = 0;
+			this.vy = 0;
+			this.vr = 0;
+			this.va = 0;
+			this.angle = 0;
+		}
+		
+		XFillRectangle.prototype = Object.create(X.FillRectangle.prototype);
+		XFillRectangle.prototype.constructor = XFillRectangle;	
+		/*
+============================================================================
+		*/	
+		
+		
+		var stats = new Stats();
+		stats.setMode(0);
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.left = '0px';
+		stats.domElement.style.top = '0px';
+
+		document.body.appendChild(stats.domElement);
+		
+		
+		var stage = null;
+			
+		
+		init();
+		
+		function init() {
+			stage = new X.Stage(null, window.innerWidth, window.innerHeight);
+			var rect = null,
+				angle = 0,
+				rad = 0,
+				size = 0;
+			
+			var colors = [
+				"red", "green"
+			];
+			
+			for(var i = 0; i < 100; i++)
+			{
+				angle += 0.1;
+				rad += 5;
+				size = 100 + Math.sin(angle) * 25;
+				rect = new XFillRectangle(colors[Math.floor(Math.random() * colors.length)], stage.width/2 + Math.cos(angle) * rad, stage.height/2 + Math.sin(angle) * rad, size, size);
+				rect.rotation = angle;
+				rect.angle = angle;
+				
+				stage.add(rect);
+			}
+		}
+		
+		
+		
+	
+		(function enterFrame() {
+			requestAnimFrame(enterFrame);
+			
+			stats.begin();
+			render();
+			stats.end();
+			
+		})();
+		
+		
+		var aa = 0;
+		function render(){
+			var len = stage.displayList.length;
+			
+			stage.clearFill("rgba(0, 0, 0, 0.3)");
+			
+		
+			for(var i = 0; i < len; i++)
+			{
+				stage.displayList[i].angle += 0.1;
+				stage.displayList[i].width = stage.displayList[i].height = 100 + Math.cos(stage.displayList[i].angle) * 25;
+				stage.displayList[i].rotation += 0.01;
+				stage.displayList[i].draw();
+			}
+		}
+		
+
+
+		
+	</script>	
+</body>
+</html>

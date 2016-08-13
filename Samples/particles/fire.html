@@ -1,0 +1,109 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Fire</title>
+	<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+	<div style="display:none">
+		<img src="img/particle2.png" id="particleImage"/>
+	</div>
+	<script type="text/javascript" src="js/stats.min.js"></script>
+	<script type="text/javascript" src="js/request_animation_frame.js"></script>
+	<script type="text/javascript" src="js/x.js"></script>
+	<script type="text/javascript">
+		var scene = null,
+			stats = null,
+			maxParticle = 1000,
+			img = null,
+			mouseX = 0, 
+			mouseY = 0;
+			
+		window.onload = init;
+		
+		function init()
+		{
+			stats = new Stats();
+			stats.domElement.style.position = "absolute";
+			stats.domElement.style.left = "10px";
+			stats.domElement.style.top = "10px";
+			document.body.appendChild(stats.domElement);		
+		
+			scene = new X.Scene();
+			scene.setRenderer(new X.CanvasRenderer());
+			scene.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(scene.getCanvas());
+			
+			mouseX = scene.width / 2;
+			mouseY = scene.height / 2;
+			
+			img = document.getElementById("particleImage");
+			createParticle(img, 10);
+			
+			scene.render();
+			
+			addEventListener("mousemove", onMouseMove);
+			animate();
+		}
+		
+		function createParticle(img, numParticle)
+		{
+			var particle = null;
+			for(var i = 0; i < numParticle; i++)
+			{
+				particle = new X.Particle(img, mouseX, mouseY);
+				particle.alpha = 0.5;
+				particle.vx = Math.random() * 4 - 2;
+				particle.vy = -Math.random() * 10 - 5;
+				
+				scene.displayObjects.push(particle);
+			}
+		}
+		
+		function onMouseMove(e)
+		{
+			mouseX = e.clientX;
+			mouseY = e.clientY;
+		}
+		
+		function animate()
+		{
+			requestAnimationFrame(animate);
+			stats.begin();
+			renderScene();
+			stats.end();
+		}
+		
+		function renderScene()
+		{
+			scene.clearFill("rgba(0, 0, 0, 0.3)");
+			scene.setCompositeOperation("lighter");
+			
+			var len = scene.displayObjects.length;
+			
+			if(len < maxParticle)
+			{
+				createParticle(img, 10);
+			}
+			
+			for(var i = 0; i < len; i++)
+			{							
+				scene.displayObjects[i].x += scene.displayObjects[i].vx;
+				scene.displayObjects[i].y += scene.displayObjects[i].vy;
+				
+				
+				if(scene.displayObjects[i].y < 0)
+				{
+					scene.displayObjects[i].x = mouseX;
+					scene.displayObjects[i].y = mouseY;
+				}
+				
+				scene.displayObjects[i].draw();
+			}
+			
+			scene.render();
+		}
+	</script>
+</body>
+</html>

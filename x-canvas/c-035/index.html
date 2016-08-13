@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-035</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<script src="../utility/V2D-v0.1.js"></script>
+	<canvas id="c"></canvas>
+	<script>
+
+	"use strict";
+
+	(function(init) {
+
+		init(window, document);
+
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight,
+			mouse = {
+				x: w / 2,
+				y: h / 2
+			};
+
+/**
+ * ============================================
+ */
+ 		function Pointer(position, radius, color)  {
+ 			this.position = position;
+ 			this.radius = radius;
+ 			this.color = color;
+ 			this.angle = 0;
+ 			this.targetAngle = 0;
+ 		}
+
+ 		Pointer.prototype = {
+ 			constructor: Pointer,
+ 			update: function() {
+
+ 				var dx = mouse.x - this.position.x,
+ 					dy = mouse.y - this.position.y;
+
+ 				this.targetAngle = Math.atan2(dy, dx);
+ 				this.angle += (this.targetAngle - this.angle) * 0.2;
+ 				
+ 			},
+ 			render: function(ctx) {
+
+ 				ctx.fillStyle = this.color;
+ 				ctx.beginPath();
+ 				ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+ 				ctx.fill();
+
+ 				ctx.fillStyle = this.color;
+ 				ctx.save();
+ 				ctx.translate(this.position.x, this.position.y);
+ 				ctx.rotate(this.angle);
+ 				ctx.fillRect(0, -this.radius / 2, this.radius * 2, this.radius);
+ 				ctx.restore();
+
+ 			}
+ 		};
+
+/**
+ * ============================================
+ */ 
+ 		var pointer = null,
+ 			pointers = [],
+ 			objectCount = 100;
+
+ 		for(var i = 0; i < objectCount; i++) {
+
+			pointer = new Pointer(
+ 				V2D.create(w * Math.random(), h * Math.random()),
+ 				20 * Math.random() + 5, 
+ 				"black"
+ 			);
+
+ 			pointers.push(pointer);
+
+ 		}
+
+ 		document.body.addEventListener("mousemove", function(e) {
+ 			mouse.x = e.clientX;
+ 			mouse.y = e.clientY;
+ 		});
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.clearRect(0, 0, w, h);
+
+ 			for(var i = 0; i < objectCount; i++) {
+ 				pointer = pointers[i];
+	 			pointer.update();
+	 			pointer.render(ctx); 				
+ 			}
+
+ 		});
+
+	});
+	</script>	
+</body>
+</html>

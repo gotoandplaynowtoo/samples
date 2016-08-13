@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>FillRectangle Demo 2</title>
+	<style type="text/css">
+		body {
+			margin: 0px;
+			padding: 0px;
+			overflow: hidden;
+		}
+
+	</style>
+</head>
+<body>
+	<script type="text/javascript" src="js/stat.js"></script>
+	<script type="text/javascript" src="js/request_anim_frame.js"></script>
+	<script type="text/javascript" src="js/x.js"></script>
+	
+	<script type="text/javascript">	
+	
+		
+		/*
+			EXTENDED FillRectangle class
+==========================================================================			
+		*/
+		function XFillRectangle(style, x, y, width, height) {
+			X.FillRectangle.call(this, style, x, y, width, height);
+			this.vx = 0;
+			this.vy = 0;
+			this.vr = 0;
+		}
+		
+		XFillRectangle.prototype = Object.create(X.FillRectangle.prototype);
+		XFillRectangle.prototype.constructor = XFillRectangle;	
+		/*
+============================================================================
+		*/	
+		
+		
+		var stats = new Stats();
+		stats.setMode(0);
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.left = '0px';
+		stats.domElement.style.top = '0px';
+
+		document.body.appendChild(stats.domElement);
+		
+		
+		var stage = null;
+		
+		init();
+		
+		function init() {
+			stage = new X.Stage(null, window.innerWidth, window.innerHeight);
+			var rect = null;
+
+			
+			for(var i = 0; i < 1000; i++)
+			{
+				rect = new XFillRectangle(null, null, null, 5, 10);				
+				resetProperty(i, rect);
+				stage.add(rect);
+			}
+			
+		}
+		
+		function resetProperty(i, rect) {
+			var colors = [
+				"#2B0366",
+				"#DE18FF",
+				"#DA18E8",
+				"#9912B4",
+				"#7205DA",
+				"#FA2DF4"
+			];
+			
+			rect.style = colors[Math.floor(Math.random() * colors.length)];
+			rect.x = stage.width / 2;
+			rect.y = stage.height / 2
+			rect.vx = Math.sin(i) * 5;
+			rect.vy = Math.cos(i) * 5;
+			rect.vr = Math.random() * 0.1;
+			rect.alpha = 0.2;			
+		}
+	
+	
+		(function enterFrame() {
+			requestAnimFrame(enterFrame);
+			
+			stats.begin();
+			render();
+			stats.end();
+			
+		})();
+		
+		function render(){
+			
+			stage.clearFill("rgba(0, 0, 0, 0.1)");
+			stage.setComposite("lighter");
+			
+			for(var i = 0, len = stage.displayList.length; i < len; i++)
+			{
+				stage.displayList[i].x += stage.displayList[i].vx + Math.random() - 0.5;
+				stage.displayList[i].y += stage.displayList[i].vy + Math.random() - 0.5;
+				stage.displayList[i].rotation += stage.displayList[i].vr;
+				
+				
+				if(stage.displayList[i].x < 0 || stage.displayList[i].x > stage.width || stage.displayList[i].y < 0 || stage.displayList[i].y > stage.height)
+				{
+					resetProperty(i, stage.displayList[i]);
+				}
+				
+				stage.displayList[i].draw();
+			}
+		}
+		
+
+
+		
+	</script>	
+</body>
+</html>

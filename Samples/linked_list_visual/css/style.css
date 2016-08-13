@@ -1,0 +1,23 @@
+body {
+	background: black;
+}
+
+.node {
+	position: absolute;
+}
+
+.line {
+	position: absolute;
+	height: 1px;
+	
+	-webkit-transform-origin: 0% 0%;
+	-moz-transform-origin: 0% 0%;
+}		
+
+.container {
+	position: relative;
+	background: rgba(255, 255, 255, 0.05);
+	overflow: hidden;
+	width: 960px;
+	height: 500px;
+}	

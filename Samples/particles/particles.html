@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Particles</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css"/>
+</head>
+<body>
+	<script src="js/request_animation_frame.js"></script>
+	<script src="js/stats.min.js"></script>
+	<script src="js/x.js"></script>
+	<script>
+		var scene = null,
+			stats = null,
+			maxParticle = 1000,
+			prevMouseX = 0,
+			prevMouseY = 0,
+			mouseX = 0,
+			mouseY = 0,
+			friction = 0.98,
+			d = 0,
+			dx = 0,
+			dy = 0,
+			acc = 0,
+			isMouseDown = false;
+		
+		window.onload = init;
+		
+		function init() 
+		{
+			stats = new Stats();
+			stats.domElement.style.position = "absolute";
+			stats.domElement.style.left = "10px";
+			stats.domElement.style.top = "10px";
+			document.body.appendChild(stats.domElement);
+			
+			scene = new X.Scene();
+			scene.setRenderer(new X.CanvasRenderer());
+			scene.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(scene.getCanvas());
+			
+			mouseX = scene.width/2;
+			mouseY = scene.height/2;
+			prevMouseX = mouseX;
+			prevMouseY = mouseY;			
+			
+			particleImage = new Image();
+			particleImage.src = "img/particle.png";
+			var particle = null;
+					
+			for(var i = 0; i < maxParticle; i++)
+			{			
+				particle = new X.Particle(particleImage, scene.width/2, scene.height/2);
+				particle.vx = Math.cos(i) * Math.random() * 40;
+				particle.vy = Math.sin(i) * Math.random() * 40;
+				particle.scaleX = particle.scaleY = 0.2 + Math.random() * 0.3;
+				particle.alpha = Math.random();
+				
+				scene.add(particle);
+			}
+			
+			
+			scene.render();
+			
+			addEventListener("mousedown", onMouseDown);
+			addEventListener("mouseup", onMouseUp);
+			addEventListener("mousemove", onMouseMove);
+			
+			animate();
+		}//end of init
+		
+		function onMouseMove(e) 
+		{
+			prevMouseX = mouseX;
+			prevMouseY = mouseY;		
+			mouseX = e.clientX;
+			mouseY = e.clientY;
+		}
+		
+		function onMouseDown(e)
+		{
+			isMouseDown = true;
+		}		
+		
+		function onMouseUp(e) 
+		{
+			isMouseDown = false;
+		}
+		
+		function animate() 
+		{
+			requestAnimationFrame(animate);
+			
+			stats.begin();
+			renderScene();
+			stats.end();	
+		}
+		
+		function renderScene() 
+		{
+			scene.clearFill("rgba(0, 0, 0, 0.5)");
+			scene.setCompositeOperation("lighter");
+			
+			
+			for(var i = 0, len = scene.displayObjects.length; i < len; i++)
+			{
+				applyPhysics(scene.displayObjects[i]);
+				checkSceneBounds(scene.displayObjects[i]);
+				
+				scene.displayObjects[i].draw();
+			}
+			
+			scene.render();
+			
+		}
+		
+		function applyPhysics(displayObject) 
+		{
+			
+			dx = mouseX - displayObject.x;
+			dy = mouseY - displayObject.y;
+			d = Math.sqrt(dx * dx + dy * dy) || 0.001;
+			
+			dx /= d;
+			dy /= d;
+	
+			if(isMouseDown)
+			{
+				if(d < scene.width * 0.5)
+				{
+					acc = (1 - d / (scene.width * 0.5)) * 10;
+					displayObject.vx -= dx * acc + Math.random() - 0.5;
+					displayObject.vy -= dy * acc + Math.random() - 0.5;
+				}
+			}
+			
+			
+			if(d < scene.width * 0.8)
+			{
+				acc = (1 - d / (scene.width * 0.8)) * scene.width * 0.002;
+				displayObject.vx += dx * acc;
+				displayObject.vy += dy * acc;
+			}
+			else
+			{
+				displayObject.vx += Math.random() - 0.5;
+				displayObject.vy += Math.random() - 0.5;				
+			}
+			
+			if(d < scene.width * 0.1)
+			{
+				acc = (1 - d / (scene.width * 0.1)) * scene.width * 0.0003;
+				displayObject.vx += (mouseX - prevMouseX) * acc;
+				displayObject.vy += (mouseY - prevMouseY) * acc;					
+			}
+			
+			
+			
+			displayObject.vx *= friction;
+			displayObject.vy *= friction;
+			
+			displayObject.x += displayObject.vx;
+			displayObject.y += displayObject.vy;
+					
+		
+		}
+		
+		function checkSceneBounds(displayObject) 
+		{
+			if(displayObject.x < 0)
+			{
+				displayObject.x = 0;
+				displayObject.vx *= -1;
+			}
+			else if(displayObject.x > scene.width)
+			{
+				displayObject.x = scene.width;
+				displayObject.vx *= -1;
+			}
+			
+			if(displayObject.y < 0)
+			{
+				displayObject.y = 0;
+				displayObject.vy *= -1;
+			}
+			else if(displayObject.y > scene.height)
+			{
+				displayObject.y = scene.height;
+				displayObject.vy *= -1;				
+			}		
+		}
+	</script>
+</body>
+</html>

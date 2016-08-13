@@ -1,0 +1,3 @@
+Controls: 
+
+Shooting - Tap

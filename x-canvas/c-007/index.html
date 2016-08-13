@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-007</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+	(function(window, document) {
+
+		"use strict";
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+
+/**
+ *==========================================
+ */
+
+ 		function Square(x, y, size, color) {
+ 			this.x = x;
+ 			this.y = y;
+ 			this.size = size;
+ 			this.color = color;
+ 			this.angle = 0;
+ 		}//END OF SQUARE CONSTRUCTOR
+
+ 		Square.prototype = {
+ 			constructor: Square,
+ 			update: function() {
+ 				this.angle += 0.02;
+ 				this.size = 100 + Math.sin(angle) * 10;
+ 			},
+ 			render: function(ctx) {
+
+ 				ctx.save();
+
+ 				ctx.translate(this.x, this.y);
+ 				ctx.rotate(this.angle);
+
+ 				ctx.fillStyle = "black";
+				ctx.fillRect(-(this.size + 2) / 2, -(this.size + 2) /2, this.size + 2, this.size + 2); 				
+
+				ctx.fillStyle = this.color;
+ 				ctx.fillRect(-this.size / 2, -this.size/2, this.size, this.size);
+
+ 				ctx.restore();
+
+ 			}//END OF RENDER FUNCTION
+ 		};
+
+/**
+ *==========================================
+ */
+
+ 		var square = null,
+ 			squares = [],
+ 			numObjects = 400,
+ 			slice = Math.PI * 2 / numObjects,
+ 			x, y,
+ 			cx = w / 2,
+ 			cy = h / 2,
+ 			angle = 0,
+ 			radius = 20;;
+
+ 		for(var i = 0; i < numObjects; i++) {
+
+ 			x = cx + Math.cos(angle) * radius;
+ 			y = cy + Math.sin(angle) * radius;
+
+ 			square = new Square(x, y, 100 + Math.sin(angle) * 10, "white");
+ 			squares.push(square);
+
+ 			radius += .5;
+ 			angle += 0.05;
+ 		}
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+			ctx.clearRect(0, 0, w, h);
+
+ 			for(var i = 0; i < numObjects; i++) {
+
+ 				square = squares[i];
+	 			square.update();
+	 			square.render(ctx); 				
+ 			}//END OF FOR LOOP
+
+
+ 		});
+
+
+	})(window, window.document);
+	</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-014</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+	(function(window, document) {
+
+		"use strict";
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+
+/**
+ *===================================
+ */
+
+ 		function Point(x, y) {
+ 			this.x = x;
+ 			this.y = y;
+ 			this.angle = 0;
+ 			this.angleSpeed = Math.random() * 0.2 - 0.1;
+ 			this.radiusX = 5 * Math.random();
+ 			this.radiusY = 5 * Math.random();
+ 			this.radiusSpeedX = 0.5 * Math.random() + 0.5;
+ 			this.radiusSpeedY = 0.5 * Math.random() + 0.5;
+ 			this.px = this.x;
+ 			this.py = this.y;
+ 			this.hue = 360 / 2;
+ 			this.hueSpeed = 0.1;
+ 		}
+
+ 		Point.prototype = {
+ 			constructor: Point,
+ 			update: function(cx, cy) {
+
+ 				this.px = this.x;
+ 				this.py = this.y;
+
+ 				this.x = cx + Math.cos(this.angle) * this.radiusX
+ 				this.y = cy + Math.sin(this.angle) * this.radiusY;
+
+ 				this.radiusX += this.radiusSpeedX;
+ 				this.radiusY += this.radiusSpeedY;
+ 				this.angle += this.angleSpeed;
+ 				this.hue += this.hueSpeed;
+
+ 				if(this.x < 0 || this.x > w || this.y < 0 || this.y > h) {
+ 					this.x = w / 2,
+ 					this.y = h / 2;
+ 					this.px = this.x;
+ 					this.py = this.y;
+ 					this.radiusX = 0;
+ 					this.radiusY = 0; 
+ 				}
+
+ 			},
+ 			render: function(ctx) {
+
+ 				ctx.strokeStyle = "hsla(" + this.hue + ", 100%, 50%, 1)";
+
+ 				ctx.beginPath();
+ 				ctx.moveTo(this.x, this.y);
+ 				ctx.lineTo(this.px, this.py);
+ 				ctx.stroke();
+ 			}
+ 		};
+
+/**
+ *===================================
+ */ 
+ 		var p = null,
+ 			points = [],
+ 			cx = w/2,
+ 			cy = h/2,
+ 			numObjects = 100;
+
+ 		for(var i = 0; i < numObjects; i++) {
+ 			p = new Point(cx, cy);
+ 			points.push(p);
+ 		}
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			for(var i = 0; i < numObjects; i++) {
+ 				p = points[i];
+ 				p.update(cx, cy);
+ 				p.render(ctx);
+ 			}
+
+ 		});
+
+	})(window, document);
+	</script>
+</body>
+</html>

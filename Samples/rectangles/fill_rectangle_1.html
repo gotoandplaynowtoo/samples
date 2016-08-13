@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>FillRectangle Demo 1</title>
+	<style type="text/css">
+		body {
+			margin: 0px;
+			padding: 0px;
+			overflow: hidden;
+		}
+
+	</style>
+</head>
+<body>
+	<script type="text/javascript" src="js/stat.js"></script>
+	<script type="text/javascript" src="js/request_anim_frame.js"></script>
+	<script type="text/javascript" src="js/x.js"></script>
+	
+	<script type="text/javascript">	
+		
+		var stats = new Stats();
+		stats.setMode(0);
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.left = '0px';
+		stats.domElement.style.top = '0px';
+
+		document.body.appendChild(stats.domElement);
+		
+		
+		var stage = null;
+		var xSpeed = 10 +  Math.random() * 10;
+		var rSpeed = Math.random() * 0.1;
+		
+		init();
+		
+		function init() {
+			stage = new X.Stage(null, window.innerWidth, window.innerHeight);
+			var rect = new X.FillRectangle(null, null, null, null, null);
+			resetProperty(rect);
+			
+			stage.add(rect);
+		}
+	
+	
+		function resetProperty(rect) {
+			var colors = [
+				"#41D835",
+				"#A6FD3D",
+				"#FFF938",
+				"#FF632B",
+				"#FF6126",
+				"#F90C2A",
+				"#F9084F",
+				"#FF1AFB"
+			];	
+			rect.style = colors[Math.floor(Math.random() * colors.length)];
+			rect.x = -25;
+			rect.y = stage.height/2;
+			rect.width = 50;
+			rect.height = 50;
+			
+			rect.skewX = Math.random() * 2;
+			rect.skewY = Math.random() * 2;
+			rect.scaleX = Math.random() * 2;
+			rect.scaleY = Math.random() * 2;			
+	
+		}	
+	
+		(function enterFrame() {
+			requestAnimFrame(enterFrame);
+			
+			stats.begin();
+			render();
+			stats.end();
+			
+		})();
+		
+		function render(){
+			
+			stage.clearFill("rgba(0, 0, 0, 0.1)");
+			
+			for(var i = 0, len = stage.displayList.length; i < len; i++)
+			{
+				stage.displayList[i].x += xSpeed;
+				stage.displayList[i].rotation += rSpeed;
+				
+				if(stage.displayList[i].x > stage.width + stage.displayList[i].width/2)
+				{
+					xSpeed = 10 +  Math.random() * 10;
+					rSpeed = Math.random() * 0.1;
+				
+					resetProperty(stage.displayList[i]);
+					
+				}
+				
+				stage.displayList[i].draw();
+			}
+		}
+
+	</script>	
+</body>
+</html>

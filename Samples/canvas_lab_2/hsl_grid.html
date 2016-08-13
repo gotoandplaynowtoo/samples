@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HSL Grid</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+	
+		canvas {
+			display: block;
+			background: black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas-dom">Your browser does not support canvas element.</canvas>
+	<script src="stats.js"></script>
+	<script src="raf.js"></script>
+	<script src="x.js"></script>
+	<script>
+		(function() {
+
+/*--------------------------------------------------------CLASSES-----------------------------------------------------------------*/
+			function Color(settings) {
+
+				this.h = settings.h;
+				this.s = settings.s;
+				this.l = settings.l;
+				this.a = settings.a;
+
+			}
+
+			Color.prototype = {
+				update: function() {
+					this.h.value += this.h.speed;
+				},
+				toString: function() {
+					return "hsla("+ this.h.value + "," + this.s.value + "%," + this.l.value + "%," + this.a.value + ")";
+				}
+			};
+
+
+			function Rectangle(settings) {
+
+				this.position 	= settings.position;
+				this.width 		= settings.width;
+				this.height 	= settings.height;
+				this.color 		= settings.color;
+				
+
+			}
+
+			Rectangle.prototype = {
+				update: function() {
+					this.color.update();
+				},
+				render: function(context) {
+					context.save();
+					context.fillStyle = this.color.toString();
+					context.translate(this.position.x, this.position.y);
+					context.fillRect(0, 0, this.width, this.height);
+					context.restore();					
+
+				}
+			};
+
+/*--------------------------------------------------------HELPERS-----------------------------------------------------------------*/
+			function createDisplayObjects(classReference, len) {
+				
+				var displayObjects 	= [],
+					rectangle	 	= null,
+					settings		= null,
+					size			= 100,
+					spaceX 			= 10,
+					spaceY 			= 10,
+					startX 			= (classReference.Dimension.width - len.maxCol * (size + spaceX)) / 2,
+					startY 			= (classReference.Dimension.height - len.maxRow * (size + spaceY)) / 2,
+					xpos 			= startX,
+					ypos 			= startY,
+					rectangle 		= null,
+					hsl 			= null;					
+
+				for(var row = 0; row < len.maxRow; row++) {
+				
+					xpos = startX;
+					
+					for(var col = 0; col < len.maxCol; col++) {
+					
+						hsl = {
+							h: {value: Math.random() * 360, speed: Math.random() * 2},
+							s: {value: 100},
+							l: {value: 40},
+							a: {value: 0.9}
+						};
+						
+						settings = {
+							position: 	{x: xpos, y: ypos},
+							width: 		size + Math.random() * 100,
+							height: 	size + Math.random() * 100,
+							color: 		new classReference.Color(hsl)
+						};
+										
+						rectangle = new classReference.Rectangle(settings);
+						displayObjects.push(rectangle);
+
+						xpos += size + spaceX;
+						
+					}
+					
+					ypos += size + spaceY;
+				}				
+				
+				return displayObjects;
+
+			}
+
+
+/*--------------------------------------------------------MAIN-----------------------------------------------------------------*/
+			X.Dimension.init({width: window.innerWidth, height: window.innerHeight});
+			
+			X.Stage.init({
+
+				domElement: 			document.getElementById("canvas-dom"),
+				stats: 					new Stats(),
+				displayObjects: 		createDisplayObjects({
+																Color: 			Color,
+																Rectangle: 		Rectangle,
+																Dimension: 		X.Dimension
+															 }, {maxRow: 8, maxCol: 16})
+
+			});
+
+			
+			X.Stage.animate();
+
+		})();
+	</script>
+</body>
+</html>

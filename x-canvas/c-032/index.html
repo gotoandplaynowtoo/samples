@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-032</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<script src="../utility/V2D-v0.1.js"></script>
+	<canvas id="c"></canvas>
+	<script>
+	"use strict";
+	(function(init) {
+		init(window, document)
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+
+/**
+ * ==================================================
+ */		
+		function Particle(position, velocity, radius, color, delay) {
+			this.position = position;
+			this.velocity = velocity;
+			this.radius = radius;
+			this.color = color;
+			this.alpha = 1;
+			this.maxRadius = 10000;
+			this.delay = delay;
+			this.delayCount = 0;
+			this.brightness = 50;
+		}
+
+		Particle.prototype = {
+			constructor: Particle,
+			reset: function() {
+				this.alpha = 1;
+				this.radius = 1;
+				this.delayCount = 0;
+				this.brightness = 50;
+			},
+			update: function() {
+
+				if(this.delayCount < this.delay) {
+					this.delayCount++;
+					return;
+				}
+
+				this.radius += 20;
+				this.alpha = this.alpha - (this.radius / this.maxRadius);
+				this.alpha = Math.max(0, this.alpha);
+				this.brightness += 0.5;
+				this.color += 0.1;
+
+				if(this.alpha === 0) {
+					this.reset();
+				}
+
+			},
+			render: function(ctx) {
+
+				if(this.delayCount < this.delay) {
+					return;
+				}
+
+				ctx.save();
+				ctx.globalAlpha = this.alpha;
+				ctx.translate(this.position.x, this.position.y);
+				ctx.fillStyle = "hsl(" + this.color + ", 100%, " + this.brightness + "%)";
+				ctx.beginPath();
+				ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+				ctx.fill();
+				ctx.restore();
+			}
+		}
+
+/**
+ * ==================================================
+ */		
+ 		var particle = null,
+ 			particles = [],
+ 			objectCount = 10,
+ 			color = Math.random() * 360;
+
+ 		for(var i = 0; i < objectCount; i++) {
+
+			particle = new Particle(
+ 				V2D.create(w / 2, h / 2),
+ 				V2D.create(0, 0),
+ 				1, 
+ 				color,
+ 				i * 40
+ 			);
+
+ 			particles.push(particle);
+
+ 		}
+
+		requestAnimationFrame(function frame() {
+			requestAnimationFrame(frame);
+
+			ctx.fillStyle = "black";
+			ctx.fillRect(0, 0, w, h);
+
+			for(var i = objectCount - 1; i >= 0 ; i--) {
+				particle = particles[i];
+				particle.update();
+				particle.render(ctx);				
+			}
+
+		});
+
+	});
+	</script>
+</body>
+</html>

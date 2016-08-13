@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Color Wheel</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+	
+		canvas {
+			display: block;
+			background: black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas-dom">Your browser does not support canvas element.</canvas>
+	<script src="stats.js"></script>
+	<script src="raf.js"></script>
+	<script src="x.js"></script>
+	<script>
+		(function() {
+
+/*--------------------------------------------------------CLASSES-----------------------------------------------------------------*/
+			function Origin(x, y) {
+				this.x = x;
+				this.y = y;
+			}
+
+			function Rotation(value, speed) {
+				this.value = value;
+				this.speed = speed;
+			}
+
+			Rotation.prototype = {
+				update: function() {
+					this.value += this.speed;
+				}
+			};
+
+			function Square(settings) {
+
+				this.position	= settings.position;
+				this.size		= settings.size;
+				this.color		= settings.color;
+				this.rotation	= settings.rotation;				
+
+			}
+
+			Square.prototype = {
+				update: function() {
+					this.rotation.update();
+				},
+				render: function(context) {
+
+					context.save();
+					context.fillStyle = this.color;
+					context.translate(this.position.x, this.position.y);
+					context.rotate(this.rotation.value);
+					context.fillRect(0 - this.size / 2, 0 - this.size / 2, this.size, this.size);
+					context.restore();
+
+				}
+			};
+
+/*--------------------------------------------------------HELPERS-----------------------------------------------------------------*/
+			function createDisplayObjects(classReference, len) {
+				
+				var displayObjects 		= [],
+					square 				= null,
+					settings			= null,
+					origin 				= new classReference.Origin(classReference.Dimension.width / 2, classReference.Dimension.height / 2),
+					rotationPerSquare 	= classReference.Converter.toRadian(360 / len),
+					rotation			= 0,
+					positionRange		= 250,
+					minSize				= 60,
+					sizeAngle			= 0,
+					anglePerSize		= 0.1,
+					additionalSize		= 10;
+				
+				for(var i = 0; i < len; i++) {
+					
+					settings = {
+						position: {
+							x: origin.x + Math.cos(rotation) * positionRange, 
+							y: origin.y + Math.sin(rotation) * positionRange
+						},
+						size: 		minSize +  Math.cos(sizeAngle) * additionalSize,
+						color: 		"hsla(" + (classReference.Converter.toDegree(rotation)) + ", 100%, 50%, 0.1)",
+						rotation: 	new classReference.Rotation(rotation, 0.01)
+					};
+
+					square = new classReference.Square(settings);
+					displayObjects.push(square);
+
+					rotation 	+= rotationPerSquare;
+					sizeAngle 	+= anglePerSize;					
+
+				}
+
+				return displayObjects;
+
+			}
+
+
+/*--------------------------------------------------------MAIN-----------------------------------------------------------------*/
+			X.Dimension.init({width: window.innerWidth, height: window.innerHeight});
+			
+			X.Stage.init({
+
+				domElement: 			document.getElementById("canvas-dom"),
+				stats: 					new Stats(),
+				displayObjects: 		createDisplayObjects({
+																Origin: 		Origin,
+																Rotation: 		Rotation,
+																Square: 		Square,
+																Dimension: 		X.Dimension, 
+																Converter: 		X.Converter														
+															 }, 500)
+
+			});
+
+			
+			X.Stage.animate();
+
+		})();
+	</script>
+</body>
+</html>

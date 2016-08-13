@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-031</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	video {
+		display: none;
+	}
+
+	</style>
+</head>
+<body>
+	<video id="v" width="200" height="150" autoplay></video>
+	<canvas id="c" width="200" height="150"></canvas>
+	<script>
+	(function(init) {
+
+		init(window, document);
+
+	})(function(window, document, undefined) {
+
+		function getURL() {
+			return window.URL || window.webkitURL;
+		}
+
+		function getUserMedia() {
+			return navigator.getUserMedia || 
+				navigator.webkitGetUserMedia || 
+				navigator.mozGetUserMedia ||
+				navigator.msGetUserMedia;
+		}
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			v = document.getElementById("v"),
+			url = getURL();
+
+		navigator.getUserMedia = getUserMedia();
+		navigator.getUserMedia({
+			video: true,
+			audio: false
+		}, function(stream) {
+			v.src = url.createObjectURL(stream);
+		}, function(error) {
+			console.log(error);
+		});
+
+		v.addEventListener("play", function(e) {
+
+			var width = c.width,
+				height = c.height,
+				video = this;
+
+			requestAnimationFrame(function frame() {
+
+				requestAnimationFrame(frame);
+
+				ctx.drawImage(video, 0, 0, width, height);
+
+				var data = ctx.getImageData(0, 0, width, height).data;
+
+				for(var x = 0; x < width; x++) {
+					for(var y = 0; y < height; y++) {
+
+						var i = (x + y * width) * 4,
+							r = data[i],
+							g = data[i + 1],
+							b = data[i + 2],
+							a = data[i + 3],
+							brightness = (r + g + b) / 3;
+
+							ctx.save();
+							ctx.fillStyle = "rgba(" + brightness  + ", " + brightness + ", " + brightness + ", 0.6)";
+							ctx.translate(x, y);
+							ctx.fillRect(0, 0, 10, 10);
+							ctx.fill();
+							ctx.restore();														
+
+					}
+				}
+
+
+
+			});
+
+		});
+
+	});
+	</script>
+</body>
+</html>

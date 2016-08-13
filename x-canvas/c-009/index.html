@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-009</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+	(function(window, document) {
+
+		"use strict";
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+
+/**
+ *=================================================
+ */
+ 		function Circle(x, y, r) {
+ 			this.x = x;
+ 			this.y = y;
+ 			this.r = r;
+ 			this.br = this.r;
+ 			this.vx = Math.random() * 10 - 5;
+ 			this.vy = Math.random() * 10 - 5;
+ 			this.fillColor = "white";
+ 			this.strokeColor = "black";
+ 			this.a = 0;
+ 			this.va = Math.random() * 0.1;
+ 		}
+
+ 		Circle.prototype = {
+ 			constructor: Circle,
+ 			update: function() {
+
+ 				this.r = this.br + Math.cos(this.a) * (this.br / 2);
+ 				this.a += this.va;
+
+ 				this.vx += Math.random() * 1 - 0.5;
+ 				this.vy += Math.random() * 1 - 0.5;
+
+ 				this.vx *= 0.98;
+ 				this.vy *= 0.98;
+
+ 				this.x += this.vx;
+ 				this.y += this.vy;
+
+ 				if(this.x > w) {
+ 					this.x = w;
+ 					this.vx *= -1;
+ 				}
+ 				else if(this.x < 0) {
+ 					this.x = 0;
+ 					this.vx *= -1;
+ 				}
+
+ 				if(this.y > h) {
+ 					this.y = h;
+ 					this.vy *= -1;
+ 				}
+ 				else if(this.y < 0) {
+ 					this.y = 0;
+ 					this.vy *= -1;
+ 				}
+
+ 			},
+ 			render: function(ctx) {
+
+ 				ctx.fillStyle = this.fillColor;
+ 				ctx.strokeStyle = this.strokeColor;
+
+ 				ctx.save();
+ 				ctx.translate(this.x, this.y);
+ 				ctx.beginPath();
+ 				ctx.arc(0, 0, this.r, 0, Math.PI *2);
+ 				ctx.stroke();
+ 				ctx.fill();
+ 				ctx.restore();
+
+ 			}
+ 		};
+ /**
+ *=================================================
+ */
+ 		var circle = null,
+ 			circles = [],
+ 			numObjects = 50;
+
+ 		for(var i = 0; i < numObjects; i++) {
+			circle = new Circle(w/2, h/2, 5 + Math.random() * 10);
+			circles.push(circle);
+ 		}
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.fillStyle = "rgba(255, 255, 255, 0.001)";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			for(var i = 0; i < numObjects; i++) {
+ 				circle = circles[i];
+	 			circle.update();
+	 			circle.render(ctx); 				
+ 			}
+
+ 		});
+
+	})(window, document);
+	</script>
+</body>
+</html>

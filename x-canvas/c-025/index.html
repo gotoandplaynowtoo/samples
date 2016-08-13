@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-025</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script src="../utility/V2D-v0.1.js"></script>
+	<script>
+
+	"use strict";
+
+	(function(init) {
+
+		init(window, document);
+
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+/**
+ *================================================
+ */
+ 		function Particle(position, velocity, radius, color) {
+ 			this.position = position;
+ 			this.prevPosition = V2D.create(position.x, position.y);
+ 			this.velocity = velocity;
+ 			this.radius = radius;
+ 			this.color = color;
+ 			this.alpha = radius / 10 * 0.6;
+ 		}
+
+ 		Particle.prototype = {
+ 			constructor: Particle,
+ 			reset: function() {
+ 				this.position.x = -100;
+ 				this.prevPosition.x = this.position.x;
+ 				this.prevPosition.y = this.position.y; 				
+ 				this.velocity.x = Math.random() * 10;
+ 				this.radius = Math.random() * 20;
+ 				this.alpha = this.radius / 10 * 0.6;
+ 			},
+ 			update: function() {
+ 				this.prevPosition.x = this.position.x;
+ 				this.prevPosition.y = this.position.y;
+
+ 				this.velocity.y += Math.random() * 0.5 - 0.25;
+ 				this.velocity.y *= 0.98;
+ 				this.position.add(this.velocity);
+
+ 				if(this.position.x > w || this.position.y < 0 || this.position.y > h) {
+ 					this.reset();
+ 				}
+ 			},
+ 			render: function(ctx) {
+ 				ctx.save();
+ 				ctx.globalAlpha = this.alpha;
+ 				ctx.translate(this.position.x, this.position.y);
+ 				ctx.fillStyle = this.color;
+ 				ctx.beginPath();
+ 				ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+ 				ctx.fill();
+ 				ctx.restore();
+
+ 				ctx.strokeStyle = this.color;
+ 				ctx.beginPath();
+ 				ctx.moveTo(this.prevPosition.x, this.prevPosition.y);
+ 				ctx.lineTo(this.position.x, this.position.y);
+ 				ctx.stroke();
+ 			}
+ 		};
+/**
+ *================================================
+ */ 
+ 		var particle = null,
+ 			particles = [],
+ 			objectCount = 100,
+ 			color = Math.random() * 360;
+
+ 		for(var i = 0; i < objectCount; i++) {
+ 			particle = new Particle(
+ 					V2D.create(-100, Math.random() * h),
+ 					V2D.create(Math.random() * 10, 0),
+ 					Math.random() * 10,
+ 					"hsl(" + color + ", 100%, 50%)"
+ 				);
+ 			particles.push(particle);
+ 		}
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+			ctx.globalCompositeOperation = "source-over";
+ 			ctx.fillStyle = "rgba(0, 0, 0, 1)";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			ctx.globalCompositeOperation = "lighter";
+
+ 			for(var i = 0; i < objectCount; i++) {
+ 				particle = particles[i];
+ 				particle.update();
+ 				particle.render(ctx);
+ 			}
+
+ 		});
+
+
+	});
+
+	</script>
+</body>
+</html>

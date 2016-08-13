@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>FillRectangle Demo 3</title>
+	<style type="text/css">
+		body {
+			margin: 0px;
+			padding: 0px;
+			overflow: hidden;
+		}
+
+	</style>
+</head>
+<body>
+	<script type="text/javascript" src="js/stat.js"></script>
+	<script type="text/javascript" src="js/request_anim_frame.js"></script>
+	<script type="text/javascript" src="js/x.js"></script>
+	
+	<script type="text/javascript">	
+	
+		
+		/*
+			EXTENDED FillRectangle class
+==========================================================================			
+		*/
+		function XFillRectangle(style, x, y, width, height) {
+			X.FillRectangle.call(this, style, x, y, width, height);
+			this.vx = 0;
+			this.vy = 0;
+			this.vr = 0;
+			this.va = 0;
+		}
+		
+		XFillRectangle.prototype = Object.create(X.FillRectangle.prototype);
+		XFillRectangle.prototype.constructor = XFillRectangle;	
+		/*
+============================================================================
+		*/	
+		
+		
+		var stats = new Stats();
+		stats.setMode(0);
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.left = '0px';
+		stats.domElement.style.top = '0px';
+
+		document.body.appendChild(stats.domElement);
+		
+		
+		var stage = null;
+		
+		init();
+		
+		function init() {
+			stage = new X.Stage(null, window.innerWidth, window.innerHeight);
+			var rect = null;
+			
+			for(var i = 0; i < 1000; i++)
+			{
+				rect = new XFillRectangle(null, null, null, null, null);				
+				
+				resetProperty(i, rect);				
+				
+				stage.add(rect);
+			}
+			
+		}
+		
+		function resetProperty(i, rect) {
+			var colors = [
+					"#41D835",
+					"#A6FD3D",
+					"#FFF938",
+					"#FF632B",
+					"#FF6126",
+					"#F90C2A",
+					"#F9084F",
+					"#FF1AFB"
+				];		
+				
+			rect.style = colors[Math.floor(Math.random() * colors.length)];
+			rect.x = stage.width / 2; 
+			rect.y = stage.height / 2;
+			rect.width = Math.random() * 30;
+			rect.height = Math.random() * 30;
+		
+			rect.vx = Math.sin(i) * 5 * Math.random();
+			rect.vy = Math.cos(i) * 5 * Math.random();
+			rect.alpha = 0.1;
+			rect.vr = (Math.random() * 2 - 1) * 0.1;
+			rect.va = Math.random() * 0.01;		
+		}
+	
+	
+		(function enterFrame() {
+			requestAnimFrame(enterFrame);
+			
+			stats.begin();
+			render();
+			stats.end();
+			
+		})();
+		
+		function render(){
+			
+			stage.clearFill("rgba(0, 0, 0, 0.1)");
+			stage.setComposite("lighter");
+			
+			for(var i = 0, len = stage.displayList.length; i < len; i++)
+			{
+				stage.displayList[i].x += stage.displayList[i].vx;
+				stage.displayList[i].y += stage.displayList[i].vy;
+				stage.displayList[i].rotation += stage.displayList[i].vr;
+				stage.displayList[i].alpha -= stage.displayList[i].va;
+				
+				
+				if(stage.displayList[i].alpha < 0)
+				{
+					resetProperty(i, stage.displayList[i]);
+				}
+				
+				
+				stage.displayList[i].draw();
+			}
+		}
+		
+
+
+		
+	</script>	
+</body>
+</html>

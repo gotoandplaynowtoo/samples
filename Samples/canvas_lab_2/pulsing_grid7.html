@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Pulsing Grid 7</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+	
+		canvas {
+			display: block;
+			background: black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas-dom">Your browser does not support canvas element.</canvas>
+	<script src="stats.js"></script>
+	<script src="raf.js"></script>
+	<script src="x.js"></script>
+	<script>
+		(function() {
+
+/*--------------------------------------------------------CLASSES-----------------------------------------------------------------*/
+			function Angle(value, speed) {
+				this.value = value;
+				this.speed = speed;
+			}
+
+			Angle.prototype = {
+				update: function() {
+					this.value += this.speed;
+				}
+			};
+
+			function Circle(settings) {
+
+				this.position 		= settings.position;
+				this.radius 		= settings.radius;
+				this.color 			= settings.color;
+				this.scale 			= settings.scale;
+				this.angle 			= settings.angle;
+				
+			}
+
+			Circle.prototype = {
+				update: function() {
+					this.scale.x = this.scale.y = Math.abs(Math.cos(this.angle.value));
+					this.angle.update();
+				},
+				render: function(context) {
+					context.save();
+					context.fillStyle = this.color.toString();
+					context.beginPath();
+					context.translate(this.position.x, this.position.y);
+					context.scale(this.scale.x, this.scale.y);
+					context.arc(0, 0, this.radius, 0, Math.PI * 2, false);
+					context.fill();
+					context.closePath();
+					context.restore();
+				}
+			};
+
+/*--------------------------------------------------------HELPERS-----------------------------------------------------------------*/
+			function createDisplayObjects(classReference, len) {
+				
+				var displayObjects 	= [],
+					circle 			= null,
+					settings		= null,
+					radius			= 15,
+					spaceX			= 1,
+					spaceY			= 1,
+					startX			= (classReference.Dimension.width - (radius * 2 + spaceX) * (len.maxCol - 1)) / 2,
+					xpos			= startX,
+					ypos			= (classReference.Dimension.height - (radius * 2 + spaceY) * (len.maxRow - 1)) / 2,
+					angleSpeed 		= 0.1,
+					colors			= ["#33B5E5", "#AA66CC", "#99CC00", "#FFBB33", "#FF4444", "#0099CC", "#9933CC", "#669900", "#FF8800", "#CC0000"],
+					color 			= colors[Math.floor(Math.random() * colors.length)];
+					
+				for(var row = 0; row < len.maxRow; row++) {
+					
+					xpos = startX;
+					
+					for(var col = 0; col < len.maxCol; col++) {
+					
+						settings = {
+							position: {
+								x: xpos,
+								y: ypos
+							},
+							radius: radius,
+							color: color,
+							angle: new classReference.Angle((xpos * ypos), angleSpeed),
+							scale: {x: 1, y: 1}
+						};
+
+						circle = new classReference.Circle(settings);
+						displayObjects.push(circle);										
+
+						xpos += radius * 2 + spaceX;
+					}
+					
+					ypos += radius * 2 + spaceY;
+				}
+
+				return displayObjects;
+
+			}
+
+
+/*--------------------------------------------------------MAIN-----------------------------------------------------------------*/
+			X.Dimension.init({width: window.innerWidth, height: window.innerHeight});
+			
+			X.Stage.init({
+
+				domElement: 			document.getElementById("canvas-dom"),
+				stats: 					new Stats(),
+				displayObjects: 		createDisplayObjects({
+																Angle: 			Angle,
+																Circle: 		Circle,
+																Dimension: 		X.Dimension
+															 }, {maxRow: 20, maxCol: 30})
+
+			});
+
+			
+			X.Stage.animate();
+
+		})();
+	</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>c-033</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script src="../utility/V2D-v0.1.js"></script>
+	<script>
+
+	"use strict";
+
+	(function(init) {
+
+		init(window, document);
+
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+
+/**
+ * ==========================================
+ */		
+ 		function Circle(position, velocity, radius, color, delay) {
+ 			this.position = position;
+ 			this.velocity = velocity;
+ 			this.radius = 0;
+ 			this.color = color;
+ 			this.delay = delay;
+ 			this.delayCount = 0;
+ 			this.bRadius = radius;
+ 			this.vRadius = 0;
+ 		}
+
+ 		Circle.prototype = {
+ 			constructor: Circle, 
+ 			update: function() {
+
+ 				if(this.delayCount < this.delay) {
+ 					this.delayCount++;
+ 					return;
+ 				}
+
+ 				this.vRadius += (this.bRadius - this.radius) * 0.2;
+ 				this.vRadius *= 0.8;
+ 				this.radius += this.vRadius;
+
+ 				this.position.add(this.velocity);
+ 				if(this.position.x - this.radius > w) {
+ 					this.position.x = -this.radius;
+ 					this.position.y = Math.random() * h;
+ 					this.radius = 0;
+ 				}
+ 			},
+ 			render: function(ctx) {
+
+ 				if(this.delayCount < this.delay) {
+ 					return;
+ 				}
+
+ 				ctx.save();
+ 				ctx.globalAlpha = 0.8;
+ 				ctx.fillStyle = this.color;
+ 				ctx.translate(this.position.x, this.position.y);
+ 				ctx.beginPath();
+ 				ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+ 				ctx.fill();
+ 				ctx.restore();
+ 			}
+ 		};
+
+/**
+ * ==========================================
+ */		
+ 		var circle = null,
+ 			circles = [],
+ 			objectCount = 20;
+
+ 		for(var i = 0; i < objectCount; i++) {
+
+ 			circle = new Circle(
+ 				V2D.create(10, h * Math.random()),
+ 				V2D.create(5 + Math.random() * 5, 0),
+ 				30 * Math.random() + 10,
+ 				"red",
+ 				i * 20
+ 			);
+
+ 			circles.push(circle);
+ 		}
+
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.fillStyle = "black";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			for(var i = 0; i < objectCount; i++) {
+ 				circle = circles[i];
+	 			circle.update();
+	 			circle.render(ctx); 				
+ 			}
+
+ 		});
+
+	});
+
+	</script>
+</body>
+</html>

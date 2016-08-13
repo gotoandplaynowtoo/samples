@@ -1,0 +1,200 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Blue Flame</title>
+	<style type="text/css">
+		body {
+			padding		:0;
+			margin		:0;
+			overflow	:hidden;
+		}
+
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	
+	<script type="text/javascript" src="utils/requestAnimationFrame.js"></script>
+	<script type="text/javascript" src="utils/stats.min.js"></script>
+	<script type="text/javascript">
+	
+		// VARIABLES---------------------------------
+		var c 				= null, // canvas
+			ctx 			= null, // canvas context
+			particles 		= null, // array of particle
+			maxParticle		= null, // maximum particle 
+			W 				= null, // width
+			H 				= null, // height	
+			mouseX			= null,
+			mouseY			= null,
+			stats			= null; 
+	
+	
+	
+		// FUNCTIONS AND CLASSES------------------------------
+		function init() {
+		
+			stats = new Stats();
+			stats.setMode(0);
+			stats.domElement.style.position = "absolute";
+			stats.domElement.style.left	= "0px";
+			stats.domElement.style.top	= "0px";
+			
+			document.body.appendChild(stats.domElement);
+			
+			
+			c 	= document.getElementById("c");
+			ctx	= c.getContext("2d");
+			
+			W	= window.innerWidth;
+			H	= window.innerHeight;
+			
+			c.width 	= W;
+			c.height 	= H;
+			
+			particles		= [];
+			maxParticle		= 100;
+			
+			createParticle(50);
+			
+			ctx.fillStyle 	= "#000000";
+			ctx.fillRect(0, 0, W, H);
+			
+		}//end of init function
+		
+		function generateRandom(min, max) {
+			return Math.random() * (max - min) + min;
+		}//end of getRandom function
+		
+		function Particle(x, y) {
+			this.x			= x;
+			this.y			= y;
+			
+			this.vx			= null;
+			this.vy			= null;
+			                  null;
+			this.lifeSpan 	= null;
+			this.life		= null;
+			                  null;
+			this.size		= null;
+			this.r			= null;
+			this.g			= null;
+			this.b			= null;
+			this.a			= null;
+			
+			this.regenerate();
+		}//end of Particle class
+		
+		Particle.prototype = {
+			constructor: Particle,
+			draw: function() {
+			
+				var gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+			
+				gradient.addColorStop(0, "rgba(" + this.r + "," + this.g + "," + this.b + "," + this.a + ")");
+				gradient.addColorStop(0.5, "rgba(" + this.r + "," + this.g + "," + this.b + "," + this.a + ")");
+				gradient.addColorStop(1, "rgba(" + this.r + "," + this.g + "," + this.b + ", 0)");
+				ctx.fillStyle = gradient;
+				
+				ctx.beginPath();
+				ctx.arc(this.x, this.y, this.size, Math.PI * 2, false);
+				ctx.fill();
+				
+			},
+			regenerate : function () {
+				this.x			= (mouseX != null) ? mouseX : W / 2;
+				this.y			= (mouseY != null) ? mouseY : H / 2;
+			
+				this.vx			= generateRandom(-2.5, 2.5);
+				this.vy			= generateRandom(-5, -15);
+				this.vLife		= 1;
+				this.vSize		= generateRandom(0.80, 0.99);
+				
+				this.lifeSpan 	= generateRandom(20, 30);
+				this.life		= this.lifeSpan;
+				
+				this.size		= generateRandom(10, 100);
+				
+				this.r			= Math.round(generateRandom(25, 50));
+				this.g			= Math.round(generateRandom(0, 100));
+				this.b			= Math.round(generateRandom(200, 255));								
+				this.a			= this.life / this.lifeSpan;
+				
+			},
+			
+			update: function () {
+				this.x += this.vx;
+				this.y += this.vy;
+				this.life -= this.vLife;
+				this.size *= this.vSize;
+				this.a = this.life / this.lifeSpan;
+				this.a = this.a.toFixed(1);
+			}
+		}; //end of Particle.prototype
+		
+		function createParticle(numberOfParticle) {
+			for(var i = 0; i < numberOfParticle; i++) {
+			
+				var p = new Particle(null, null);
+				
+				particles.push(p);
+				p.draw();
+				
+			}//end of for loop
+		}//end of createParticle function
+		
+		function onMouseMoveHandler(e) {
+			mouseX = e.pageX;
+			mouseY = e.pageY;
+		}//end of onMouseMoveHandler function		
+		
+		function clear() {
+			ctx.globalCompositeOperation = "source-over";
+			ctx.fillStyle = "#000000";
+			ctx.fillRect(0, 0, W, H);
+			ctx.globalCompositeOperation = "lighter";
+		}//end of clear function
+		
+		function frame() {
+			var particleCount = particles.length;
+			
+			clear();
+			
+			if(particleCount < maxParticle) {
+				createParticle(1);
+			}
+			
+			for(var i = 0; i < particleCount; i++) {
+				particles[i].update();
+				particles[i].draw();
+				
+				if(particles[i].life <= 0 || particles[i].size <= 0) {
+					particles[i].regenerate();
+				}
+			}//end of for loop
+			
+		}//end of frame function
+				
+		function animate() {
+			stats.begin();
+			requestAnimationFrame(animate);
+			frame();
+			stats.end();
+		}//end of animate function		
+	
+	
+	
+		// START POINT-------------------------------			
+		window.onload = function() {
+			init();
+			c.addEventListener('mousemove', onMouseMoveHandler);
+			animate();
+		};//end of onload function
+		
+		
+
+		
+	</script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-012</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+
+	window.myCustomFunction = function() {
+		console.log("test");
+	};
+
+	(function(window, document) {
+
+		"use strict";
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+
+/**
+ *==================================
+ */	
+
+ 		function Square(x, y, width, height, color, angle)	 {
+ 			this.x = x;
+ 			this.y = y;
+ 			this.width = width;
+ 			this.height = height;
+ 			this.color = color;
+ 			this.angle = angle;
+ 			this.baseHeight = height;
+ 			this.minHeight = height / 2;
+ 		}
+
+ 		Square.prototype = {
+ 			constructor: Square,
+ 			update: function() {
+ 				this.height = (this.minHeight + this.baseHeight) + Math.sin(this.angle) * this.baseHeight;
+ 				this.color += 0.5;
+ 				this.angle += 0.05;
+ 			},
+ 			render: function(ctx) {
+ 				ctx.save();
+ 				ctx.fillStyle = "hsl(" + this.color + ", 100%, 50%)";
+ 				ctx.translate(this.x, this.y);
+ 				ctx.scale(1, -1);
+ 				ctx.fillRect(0, 0, this.width, this.height);
+ 				ctx.restore();
+ 			}
+ 		};
+
+/**
+ *==================================
+ */ 
+ 		var square,
+ 			squares = [],
+ 			numObjects = 400,
+ 			x, 
+ 			y, 
+ 			sw, 
+ 			sh, 
+ 			color, 
+ 			angle,
+ 			angleInc = Math.random() * 0.01;
+
+ 		x = 0;
+		y = h;
+ 		sw = w / numObjects;
+ 		sh = 100 + Math.random() * 100;
+ 		color = Math.random() * 360;
+ 		angle = Math.random() * 360;
+
+ 		for(var i = 0; i < numObjects; i++) {
+
+ 			x = sw * i;
+ 			angle += angleInc;
+ 			color += 0.1;
+
+			square = new Square(
+				x, 
+				y, 
+				sw, 
+				sh, 
+				color, 
+				angle
+			); 
+
+			squares.push(square);
+
+ 		}	
+
+ 		window.requestAnimationFrame(function frame() {
+
+ 			window.requestAnimationFrame(frame);
+
+ 			ctx.fillStyle = "rgba(0, 0, 0, 1)";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			for(var i = 0; i < numObjects; i++) {
+ 				square = squares[i];
+ 				square.update();
+ 				square.render(ctx); 				
+ 			}
+
+ 		});
+
+	})(window, window.document);
+	</script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-030</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+
+	html, body {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	body {
+		background: black;
+	}
+
+	canvas {
+		display: block;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+	</style>
+</head>
+<body>
+	<video id="v" width="400" height="300" autoplay style="display: none"></video>
+	<canvas id="c" width="400" height="300"></canvas>
+	<script>
+	(function(init) {
+
+		init(window, document);
+
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			v = document.getElementById("v"),
+			url = window.URL || window.webkitURL;
+
+		
+		navigator.getMedia = navigator.getUserMedia ||
+							navigator.webkitGetUserMedia ||
+							navigator.mozGetUserMedia ||
+							navigator.msGetUserMedia;
+							
+		navigator.getMedia({
+			video: true,
+			audio: false
+		}, function(stream) {
+			v.src = url.createObjectURL(stream);
+		}, function(error) {
+			console.log(error);
+		});
+
+		v.addEventListener("play", function(e) {
+
+			var video = this,
+				width = c.width, 
+				height = c.height;
+
+			var ar = 0,
+				ag = 0,
+				ab = 0,
+				rr = Math.random() * 255,
+				gr = Math.random() * 255,
+				br = Math.random() * 255;
+
+			requestAnimationFrame(function frame() {
+
+				requestAnimationFrame(frame);
+
+				var img, data, r, g, b, a, brightness;
+
+				ctx.drawImage(video, 0, 0, width, height);
+
+				img = ctx.getImageData(0, 0, width, height);
+				data = img.data;				
+
+				for(var i = 0, len = data.length; i < len; i += 4) {
+
+					data[i] = data[i] + Math.cos(ar) * rr;
+					data[i + 1] = data[i + 1]  + Math.sin(ag) * gr;
+					data[i + 2] = data[i + 2]  + Math.cos(ab) * br;
+
+				}
+
+				ar += 0.1;
+				ag += 0.05;
+				ab += 0.02;
+
+				img.data = data;
+				ctx.putImageData(img, 0, 0);
+
+			});
+
+		});
+
+	});
+	</script>
+</body>
+</html>

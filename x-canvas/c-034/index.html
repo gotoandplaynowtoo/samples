@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-034</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+		background: black;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script src="../utility/V2D-v0.1.js"></script>
+	<script>
+
+	"use strict";
+
+	(function(init) {
+
+		init(window, document);
+
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight,
+			bound = {
+				x: w / 2 - 200,
+				y: h / 2 - 150,
+				w: 400,
+				h: 300
+			},
+			mouse = {
+				x: w / 2,
+				y: h / 2
+			};
+
+/**
+ * ==========================================
+ */
+ 		function Particle(position, velocity, radius, color) {
+ 			this.position = position;
+ 			this.velocity = velocity;
+ 			this.radius = 0;
+ 			this.color = color;
+ 			this.radiusChangeCount = 0;
+ 			this.baseRadius = radius;
+ 		}
+
+ 		Particle.prototype = {
+ 			constructor: Particle,
+ 			update: function(bound) {
+
+ 				if(this.radiusChangeCount++ > 200) {
+ 					this.radiusChangeCount = 0;
+ 					this.baseRadius = 5 + Math.random() * 35;
+ 				}
+
+ 				this.radius += (this.baseRadius - this.radius) * 0.2;
+
+ 				this.position.x += (mouse.x - this.position.x) * 0.2; 
+ 				this.position.y += (mouse.y - this.position.y) * 0.2;
+
+ 				this.position.x = clamp(this.position.x, bound.x, bound.x + bound.w);
+ 				this.position.y = clamp(this.position.y, bound.y, bound.y + bound.h);
+
+ 				if(this.position.x + this.radius > bound.x + bound.w) {
+ 					this.position.x = bound.x + bound.w - this.radius;
+ 				}
+ 				else if(this.position.x - this.radius < bound.x) {
+ 					this.position.x = bound.x + this.radius;
+ 				}
+
+ 				if(this.position.y + this.radius > bound.y + bound.h) {
+ 					this.position.y = bound.y + bound.h - this.radius;
+ 				}
+ 				else if(this.position.y - this.radius < bound.y) {
+ 					this.position.y = bound.y + this.radius;
+ 				}
+
+ 			},
+ 			render: function(ctx) {
+ 				ctx.fillStyle = this.color;
+ 				ctx.beginPath();
+ 				ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+ 				ctx.fill();
+ 			}
+ 		};
+
+ 		//UTIL
+ 		function clamp(value, min, max) {
+ 			return Math.min(Math.max(value, min), max);
+ 		}
+/**
+ * ==========================================
+ */		
+ 		var particle = new Particle(
+ 				V2D.create(w / 2, h / 2),
+ 				V2D.create(0, 0),
+ 				5 + Math.random() * 35,
+ 				"red"
+ 			);
+
+
+ 		document.body.addEventListener("mousemove", function(e) {
+ 			mouse.x = e.clientX;
+ 			mouse.y = e.clientY;
+ 		});
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.clearRect(0, 0, w, h);
+
+ 			ctx.fillStyle = "#ccc";
+ 			ctx.fillRect(bound.x, bound.y, bound.w, bound.h);
+
+ 			particle.update(bound);
+ 			particle.render(ctx);
+
+ 		});
+	});
+
+	</script>
+</body>
+</html>

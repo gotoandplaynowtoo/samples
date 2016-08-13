@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Circular</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+	
+		canvas {
+			display: block;
+			background: black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas-dom">Your browser does not support canvas element.</canvas>
+	<script src="stats.js"></script>
+	<script src="raf.js"></script>
+	<script src="x.js"></script>
+	<script>
+		(function() {
+
+/*--------------------------------------------------------CLASSES-----------------------------------------------------------------*/
+			function Angle(settings) {
+
+				this.value = settings.value;
+				this.speed = settings.speed;
+
+			}
+
+			Angle.prototype = {
+				update: function() {
+					this.value += this.speed;
+				}
+			};
+
+/*--------------------------------------------------------------------------------------------------------------------------------*/
+
+			function Origin(x, y) {
+
+				this.x = x;
+				this.y = y;
+				
+			}
+
+/*--------------------------------------------------------------------------------------------------------------------------------*/			
+
+			function Orbit(radius) {
+				this.radius = radius;
+			}
+
+/*--------------------------------------------------------------------------------------------------------------------------------*/			
+
+			function Color(settings) {
+
+				this.h = settings.h;
+				this.s = settings.s;
+				this.l = settings.l;
+				
+			}
+
+			Color.prototype = {
+				update: function() {
+					this.h.value += this.h.speed;
+				},
+				toString: function() {
+
+					return "hsl(" + this.h.value + ", " + this.s.value + "%, " + this.l.value + "%)";
+
+				}
+			};
+
+/*--------------------------------------------------------------------------------------------------------------------------------*/			
+
+			function Circle(settings) {
+
+				this.position	= settings.position;
+				this.color 		= settings.color;
+				this.scale 		= settings.scale;
+				this.radius 	= settings.radius;
+				this.angle 		= settings.angle;
+				this.orbit		= settings.orbit;
+				this.origin 	= settings.origin;
+
+			}
+
+			Circle.prototype = {
+				update: function() {
+
+					this.position.x = this.origin.x + Math.cos(this.angle.value) * this.orbit.radius;
+					this.position.y = this.origin.y + Math.sin(this.angle.value) * this.orbit.radius;
+
+					this.angle.update();
+					this.color.update();
+
+				},
+				render: function(context) {
+
+					context.save();
+					context.fillStyle = this.color.toString();
+					context.beginPath();
+					context.translate(this.position.x, this.position.y);
+					context.scale(this.scale.x, this.scale.y);
+					context.arc(0, 0, this.radius, 0, Math.PI * 2, false);
+					context.fill();
+					context.closePath();
+					context.restore();
+
+				}
+			};
+
+/*--------------------------------------------------------HELPERS-----------------------------------------------------------------*/
+			function createDisplayObjects(classReference, len) {
+				
+				var displayObjects 	= [],
+					circle 			= null,
+					settings		= null,
+					origin 			= new classReference.Origin(classReference.Dimension.width / 2, classReference.Dimension.height / 2),
+					hsl				= {
+										h: {value: Math.random() * 360, speed: 0.001},
+										s: {value: 100},
+										l: {value: 50}
+									  },
+					color 			= new classReference.Color(hsl),
+					angleIncrement	= classReference.Converter.toRadian(1),
+					position 		= null,
+					scale			= null,
+					angleValue 		= 0,
+					radius			= null;
+
+				for(var i = 0; i < len; i++) {
+
+					radius 		= 50 + i * 2;
+					position 	= {
+
+						x: origin.x + Math.cos(angleValue) * radius,
+						y: origin.y + Math.sin(angleValue) * radius
+
+					};
+
+					scale = {
+						x: Math.sqrt(Math.pow(origin.x - position.x, 2) + Math.pow(origin.y - position.y, 2)) * 0.006,
+						y: Math.sqrt(Math.pow(origin.x - position.x, 2) + Math.pow(origin.y - position.y, 2)) * 0.006
+					};
+
+					settings = {
+						position: 	position,
+						color: 		color,
+						scale: 		scale,
+						radius: 	10,
+						angle: 		new classReference.Angle({value: angleValue, speed: 0.01}),
+						orbit: 		new classReference.Orbit(radius),
+						origin: 	origin
+					};
+
+					circle = new classReference.Circle(settings);
+					displayObjects.push(circle);
+
+					angleValue += angleIncrement + 0.8;
+
+				}
+
+				return displayObjects;
+
+			}
+
+
+/*--------------------------------------------------------MAIN-----------------------------------------------------------------*/
+
+			X.Dimension.init({width: window.innerWidth, height: window.innerHeight});
+			
+			X.Stage.init({
+
+				domElement: 			document.getElementById("canvas-dom"),
+				stats: 					new Stats(),
+				clearColor: 			"rgba(0, 0, 0, 0.02)",
+				displayObjects: 		createDisplayObjects({
+																Angle:  Angle,
+																Origin: Origin,
+																Orbit: 	Orbit, 
+																Color: 	Color,
+																Circle: Circle,
+																Dimension: X.Dimension, 
+																Converter: X.Converter
+															 }, 200)
+
+			});
+
+			X.Stage.animate();
+
+		})();
+	</script>
+</body>
+</html>

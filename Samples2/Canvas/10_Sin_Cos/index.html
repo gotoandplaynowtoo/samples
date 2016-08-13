@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Sin Cos</title>
+	<style>
+
+	* {
+		padding: 0;
+		margin: 0;
+	}
+
+	html, body {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	body {
+		background: #eee;
+	}
+
+	canvas {
+		display: block;
+		background: white;
+	}
+
+	.canvas-container {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+
+	</style>
+</head>
+<body>
+	<div class="canvas-container">
+		<canvas id="c"></canvas>
+	</div>
+	<script>
+	"use strict";
+	;(function(main) {
+		main(window, document);
+	})(function(window, document) {
+
+		var canvas = document.getElementById("c"),
+			context = canvas.getContext("2d"),
+			width = canvas.width = 960,
+			height = canvas.height = 600;
+
+/**
+ * ============================================
+ */
+ 		var cx = width / 2,
+ 			cy = height / 2;
+
+ 		var box = {
+ 			x: cx,
+ 			y: cy,
+ 			width: 20,
+ 			height: 20,
+ 			baseWidth: 20,
+ 			baseHeight: 20,
+ 			angle: 0,
+ 			color: "#222",
+ 			rotation: 0
+ 		};
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			box.x = cx + Math.cos(box.angle) * 200;
+ 			box.y = cy + Math.sin(box.angle) * 200;
+
+ 			box.width = box.baseWidth + Math.cos(box.angle) * box.baseWidth / 2;
+ 			box.height = box.baseHeight + Math.sin(box.angle) * box.baseHeight / 2;
+
+ 			box.angle += 0.05;
+ 			box.rotation -= 0.05;
+
+ 			context.clearRect(0, 0, width, height);
+
+ 			context.save();
+ 			context.translate(box.x, box.y);
+ 			context.rotate(box.rotation);
+ 			context.fillStyle = box.color;
+ 			context.fillRect(-box.width/2, -box.height/2, box.width, box.height);
+ 			context.restore();
+
+ 			context.beginPath();
+ 			context.strokeStyle = box.color;
+ 			context.moveTo(cx, cy);
+ 			context.lineTo(box.x, box.y);
+ 			context.stroke();
+
+
+ 		});
+
+	});
+	</script>
+</body>
+</html>

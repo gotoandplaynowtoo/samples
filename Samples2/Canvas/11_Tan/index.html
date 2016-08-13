@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Tan</title>
+	<style>
+
+	* {
+		padding: 0;
+		margin: 0;
+	}
+
+	html, body {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	body {
+		background: #eee;
+	}
+
+	canvas {
+		display: block;
+		background: white;
+	}
+
+	.canvas-container {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+
+	</style>
+</head>
+<body>
+	<div class="canvas-container">
+		<canvas id="c"></canvas>
+	</div>
+	<script>
+	"use strict";
+	;(function(main) {
+		main(window, document);
+	})(function(window, document) {
+
+		var canvas = document.getElementById("c"),
+			context = canvas.getContext("2d"),
+			width = canvas.width = 960,
+			height = canvas.height = 600,
+			mouse = {
+				x: width / 2,
+				y: height / 2
+			};
+
+/**
+ * ==================================================
+ */ 
+ 		function Arrow(x, y) {
+ 			this.x = x;
+ 			this.y = y;
+ 			this.rotation = 0;
+ 		}
+
+ 		Arrow.prototype = {
+ 			constructor: Arrow,
+ 			update: function() {
+
+ 				var dx = mouse.x - this.x,
+ 					dy = mouse.y - this.y,
+ 					angle = Math.atan2(dy, dx);
+
+ 				this.rotation = angle;
+
+ 			},
+ 			render: function(ctx) {
+
+ 				ctx.save();
+
+ 				ctx.translate(this.x, this.y);
+ 				ctx.rotate(this.rotation);
+ 				ctx.beginPath();
+
+ 				ctx.moveTo(-40, -20);
+ 				ctx.lineTo(40, 0);
+ 				ctx.lineTo(-40, 20);
+
+ 				ctx.closePath();
+
+ 				ctx.stroke();
+ 				ctx.restore();
+
+ 			}
+ 		};
+
+/**
+ * ==================================================
+ */  
+
+ 		var arrow = new Arrow(width / 2, height / 2);
+ 		var boundRect = canvas.getBoundingClientRect();
+
+ 		document.body.addEventListener("mousemove", function(e) {
+ 			mouse.x = e.clientX - boundRect.left;
+ 			mouse.y = e.clientY - boundRect.top;
+ 		});
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			context.clearRect(0, 0, width, height);
+
+ 			arrow.update();
+ 			arrow.render(context);
+
+ 			context.font = "12px Courier New";
+ 			context.fillText("mouse: { x: " + mouse.x + ", y: " + mouse.y + " }", 10, 20);
+ 			context.fillText("arrow.rotation: " + (arrow.rotation * 180 / Math.PI) + " deg", 10, 40);
+
+ 		});
+
+	});
+	</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>FillRectangle Demo 7</title>
+	<style type="text/css">
+		body {
+			margin: 0px;
+			padding: 0px;
+			overflow: hidden;
+		}
+
+	</style>
+</head>
+<body>
+	<script type="text/javascript" src="js/stat.js"></script>
+	<script type="text/javascript" src="js/request_anim_frame.js"></script>
+	<script type="text/javascript" src="js/x.js"></script>
+	
+	<script type="text/javascript">	
+	
+		
+		/*
+			EXTENDED FillRectangle class
+==========================================================================			
+		*/
+		function XFillRectangle(style, x, y, width, height) {
+			X.FillRectangle.call(this, style, x, y, width, height);
+			this.vx = 0;
+			this.vy = 0;
+			this.vr = 0;
+			this.va = 0;
+		}
+		
+		XFillRectangle.prototype = Object.create(X.FillRectangle.prototype);
+		XFillRectangle.prototype.constructor = XFillRectangle;	
+		/*
+============================================================================
+		*/	
+		
+		
+		var stats = new Stats();
+		stats.setMode(0);
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.left = '0px';
+		stats.domElement.style.top = '0px';
+
+		document.body.appendChild(stats.domElement);
+		
+		
+		var stage = null;
+			
+		
+		init();
+		
+		function init() {
+			stage = new X.Stage(null, window.innerWidth, window.innerHeight);
+			var rect = null, 
+				angle = 0,
+				numRect = 60,
+				color = null;
+
+			for(var i = 0; i < numRect; i++)
+			{
+				angle += 0.1;
+				color = "hsla("+(angle * 180 / Math.PI)+", 100%, 50%, 1)";
+				rect = new XFillRectangle(color , i * (stage.width/numRect), stage.height/2, 200, 10);
+				rect.rotation = angle;
+				rect.skewY = 1;
+				
+				stage.add(rect);
+			}
+		}
+		
+		
+		
+	
+		(function enterFrame() {
+			requestAnimFrame(enterFrame);
+			
+			stats.begin();
+			render();
+			stats.end();
+			
+		})();
+		
+		
+		function render(){
+			var len = stage.displayList.length;
+			
+			stage.clearFill("rgba(0, 0, 0, 0.3)");
+		
+			for(var i = 0; i < len; i++)
+			{
+				stage.displayList[i].rotation += 0.03;
+				stage.displayList[i].draw();
+			}
+		}
+		
+
+
+		
+	</script>	
+</body>
+</html>

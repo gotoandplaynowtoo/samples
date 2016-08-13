@@ -1,0 +1,50 @@
+.node {
+	position: absolute;
+}
+
+.line {
+	position: absolute;
+	height: 1px;
+	
+	-webkit-transform-origin: 0% 0%;
+	-moz-transform-origin: 0% 0%;
+}
+
+.node-animate {
+	-webkit-animation-name: scale-animate;
+	-webkit-animation-duration: 0.5s;
+	-webkit-animation-fill-mode: forwards;
+	-webkit-animation-timing-function:  cubic-bezier(0.680, -0.550, 0.265, 1.550);
+	
+	-moz-animation-name: scale-animate;
+	-moz-animation-duration: 0.5s;
+	-moz-animation-fill-mode: forwards;
+	-moz-animation-timing-function:  cubic-bezier(0.680, -0.550, 0.265, 1.550);	
+}
+
+@-webkit-keyframes scale-animate {
+	from{
+		-webkit-transform: scale(0);
+	}
+	
+	to{
+		-webkit-transform: scale(1);
+	}
+}		
+
+@-moz-keyframes scale-animate {
+	from{
+		-moz-transform: scale(0);
+	}
+	
+	to{
+		-moz-transform: scale(1);
+	}
+}
+
+	
+.container {
+	position: relative;
+	background: #000;
+	overflow: hidden;
+}

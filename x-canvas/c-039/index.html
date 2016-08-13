@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-039</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script src="../utility/V2D-v0.1.js"></script>
+	<script src="../utility/collision.js"></script>
+	<script>
+	"use strict";
+	(function(init) {
+		init(window, document);
+	})(function(window, document) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight;
+
+/**
+ * =========================================
+ */
+ 		function Particle(position, velocity, radius, color) {
+ 			this.position = position;
+ 			this.velocity = velocity;
+ 			this.radius = radius;
+ 			this.color = color;
+ 			this.hasCollided = false;
+ 		}
+
+ 		Particle.prototype = {
+ 			constructor: Particle, 
+ 			update: function() {
+
+ 				this.position.add(this.velocity);
+
+ 				if(this.position.x - this.radius > w) {
+ 					this.position.x = -this.radius;
+ 				}
+ 				else if(this.position.x + this.radius < 0) {
+ 					this.position.x = w + this.radius;
+ 				}
+
+ 				if(this.position.y - this.radius > h) {
+ 					this.position.y = -this.radius;
+ 				}
+ 				else if(this.position.y + this.radius < 0) {
+ 					this.position.y = h + this.radius;
+ 				}
+
+ 			},
+ 			render: function(ctx) {
+ 				ctx.beginPath();
+ 				
+ 				if(this.hasCollided) {
+					ctx.fillStyle = "hsla(" + this.color + ", 100%, 50%, 0.5)";
+ 				}
+ 				else {
+ 					ctx.fillStyle = "hsl(" + this.color + ", 100%, 50%)";
+ 				}
+
+ 				ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+ 				ctx.fill();
+ 			}
+ 		};
+
+/**
+ * =========================================
+ */
+ 		var particle = null,
+ 			particles = [],
+ 			color = Math.random() * 360,
+ 			objectCount = 50;
+
+ 		for(var i = 0; i < objectCount; i++) {
+ 			particle = new Particle(
+ 				V2D.create(Math.random() * w, Math.random() * h),
+ 				V2D.create(Math.random() * 10 - 5, Math.random() * 10 - 5),
+ 				10 + Math.random() * 30,
+ 				color
+ 			);
+ 			particles.push(particle);
+ 		}
+
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+ 			ctx.fillStyle = "black";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			for(var x = 0; x < objectCount; x++) {
+
+ 				for(var y = x + 1; y < objectCount; y++) {
+ 					if(collision.circleToCircle(particles[x], particles[y])) {
+ 						particles[x].hasCollided = true;
+ 						particles[y].hasCollided = true;
+ 					}
+ 				}
+
+ 			}
+
+ 			for(var i = 0; i < objectCount; i++) {
+ 				particle = particles[i];
+	 			particle.update(particles);
+	 			particle.render(ctx); 				
+ 			}
+
+ 		});
+
+	});
+	</script>
+</body>
+</html>

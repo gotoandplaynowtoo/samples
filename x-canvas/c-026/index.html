@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>C-026</title>
+	<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	canvas {
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script src="../utility/V2D-v0.1.js"></script>
+	<script>
+
+	"use strict";
+
+	(function(init) {
+
+		init(window, document);
+
+	})(function(window, document, undefined) {
+
+		var c = document.getElementById("c"),
+			ctx = c.getContext("2d"),
+			w = c.width = window.innerWidth,
+			h = c.height = window.innerHeight,
+			mouse = V2D.create(w / 2, h / 2);
+
+/**
+ *=============================================
+ */
+ 		function Particle(position, radius, color, target) {
+ 			this.position = position,
+ 			this.radius = radius;
+ 			this.color = color;
+ 			this.target = target;
+ 			this.velocity = V2D.create(0, 0);
+ 		}
+
+ 		Particle.prototype = {
+ 			constructor: Particle,
+ 			update: function() {
+ 				this.velocity.x = (this.target.x - this.position.x) * 0.5;
+ 				this.velocity.y = (this.target.y - this.position.y) * 0.5;
+ 				this.position.add(this.velocity);
+ 			},
+ 			render: function(ctx) {
+ 				ctx.save();
+ 				ctx.globalAlpha = 0.5;
+ 				ctx.strokeStyle = "hsl(" + this.color + ", 100%, 50%)";
+ 				ctx.translate(this.position.x, this.position.y);
+ 				ctx.beginPath();
+ 				ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+ 				ctx.stroke();
+ 				ctx.restore();
+ 			}
+ 		};
+/**
+ *=============================================
+ */ 
+ 		var particle = null,
+ 			particles = [],
+ 			objectCount = 200,
+ 			color = Math.random() * 360;
+
+ 		for(var i = 0; i < objectCount; i++) {
+ 			
+ 			if(i === 0) {
+				particle = new Particle(
+				 			V2D.create(w / 2, h / 2), 
+							(10 * i) + 5, 
+							color,
+							mouse
+						); 
+ 			}
+ 			else {
+				particle = new Particle(
+				 			V2D.create(w / 2, h / 2), 
+							(10 * i) + 5, 
+							color,
+							particles[i - 1].position
+						);  				
+ 			}
+
+ 			particles.push(particle);
+ 		}
+
+ 		document.body.addEventListener("mousemove", function(e) {
+ 			mouse.x = e.clientX;
+ 			mouse.y = e.clientY;
+ 		});
+
+ 		requestAnimationFrame(function frame() {
+
+ 			requestAnimationFrame(frame);
+
+			ctx.globalCompositeOperation = "source-over";
+ 			ctx.fillStyle = "black";
+ 			ctx.fillRect(0, 0, w, h);
+
+ 			ctx.globalCompositeOperation = "lighter";
+
+ 			for(var i = 0; i < objectCount; i++) {
+ 				particle = particles[i];
+ 				particle.update();
+ 				particle.render(ctx);
+ 			}
+
+ 		});
+
+	});
+
+	</script>
+</body>
+</html>

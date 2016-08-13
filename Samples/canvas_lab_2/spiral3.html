@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Spiral 3</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+	
+		canvas {
+			display: block;
+			background: black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas-dom">Your browser does not support canvas element.</canvas>
+	<script src="stats.js"></script>
+	<script src="raf.js"></script>
+	<script src="x.js"></script>
+	<script>
+		(function() {
+
+/*--------------------------------------------------------CLASSES-----------------------------------------------------------------*/
+			function Angle(value, speed) {
+				this.value = value;
+				this.speed = speed;
+			}
+
+			Angle.prototype = {
+				update: function() {
+					this.value += this.speed;
+				}
+			};
+
+			function Radius(value, speed, limit) {
+				this.value = value;
+				this.speed = speed;
+				this.limit = limit;
+			}
+
+			Radius.prototype = {
+				update: function() {
+					this.value += this.speed;
+				}
+			};
+
+			function Color(settings) {
+
+				this.h = settings.h;
+				this.s = settings.s;
+				this.l = settings.l;
+				this.a = settings.a;
+
+			}
+
+			Color.prototype = {
+				update: function() {
+					this.h.value += this.h.speed;
+				},
+				toString: function() {
+					return "hsla(" + this.h.value + ", " + this.s.value + "%, " + this.l.value + "%, "+ this.a.value +")";
+				}
+			};
+
+			function Origin(x, y) {
+				this.x = x;
+				this.y = y;
+			}
+
+			function Sketcher(settings) {
+
+				this.position 	= settings.position;
+				this.color		= settings.color;
+				this.origin 	= settings.origin;
+				this.radius 	= settings.radius;
+				this.angle		= settings.angle;
+				this.stage 		= settings.stage;
+
+			}
+
+			Sketcher.prototype = {
+				update: function() {
+
+					this.angle.update();
+					this.radius.update();
+					this.color.update();
+
+					this.position.startX = this.position.x;
+					this.position.startY = this.position.y;
+
+					this.position.x = this.origin.x + Math.cos(this.angle.value) * this.radius.value;
+					this.position.y = this.origin.y + Math.sin(this.angle.value) * this.radius.value;
+
+					if(this.radius.value > this.radius.limit) {
+						this.stage.stopAnimate();
+					}
+
+				},
+				render: function(context) {
+
+					context.strokeStyle = this.color.toString();
+					context.beginPath();
+					context.moveTo(this.position.startX, this.position.startY);
+					context.lineTo(this.position.x, this.position.y);
+					context.stroke();
+					context.closePath();
+
+				}
+			};
+
+/*--------------------------------------------------------HELPERS-----------------------------------------------------------------*/
+			function createDisplayObjects(classReference, len) {
+				
+				var displayObjects 	= [],
+					sketcher 		= null,
+					settings		= null,
+					origin			= new classReference.Origin(classReference.Dimension.width / 2, classReference.Dimension.height / 2),
+					color 			= new classReference.Color({
+										h: {value: Math.random() * 360, speed: 0.03},
+										s: {value: 100},
+										l: {value: 50},
+										a: {value: 0.5}
+									  }),
+					radius 			= new classReference.Radius(0, 0.5, 400),
+					angle 			= new classReference.Angle(0, 11);
+				
+				for(var i = 0; i < len; i++) {
+
+					settings = {
+						position: {
+							startX: origin.x + Math.cos(angle.value) * radius.value,
+							startY: origin.y + Math.sin(angle.value) * radius.value,							
+							x: 		origin.x + Math.cos(angle.value) * radius.value,
+							y: 		origin.y + Math.sin(angle.value) * radius.value
+						},
+						angle: 	angle,
+						origin: origin,
+						radius: radius,
+						color: 	color,
+						stage: classReference.Stage
+					};
+
+					sketcher = new classReference.Sketcher(settings);
+					displayObjects.push(sketcher);
+
+				}
+
+				return displayObjects;
+
+			}
+
+
+/*--------------------------------------------------------MAIN-----------------------------------------------------------------*/
+			X.Dimension.init({width: window.innerWidth, height: window.innerHeight});
+			
+			X.Stage.init({
+
+				domElement: 			document.getElementById("canvas-dom"),
+				stats: 					new Stats(),
+				clearEnabled: 			false,
+				displayObjects: 		createDisplayObjects({
+																Stage: 			X.Stage,
+																Angle: 			Angle,
+																Radius: 		Radius,
+																Color: 			Color,
+																Origin: 		Origin,
+																Sketcher: 		Sketcher,
+																Dimension: 		X.Dimension
+															 }, 1)
+
+			});
+
+			X.Stage.animate();
+
+		})();
+	</script>
+</body>
+</html>
